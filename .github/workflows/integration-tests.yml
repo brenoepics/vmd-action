@@ -1,0 +1,75 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  test-vue-mess-detector:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package-manager: [ npm, yarn, pnpm, bun ]
+
+    name: Test Vue Mess Detector with ${{ matrix.package-manager }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Check PNPM
+        if: matrix.package-manager == 'pnpm'
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.9.0'
+
+      - name: Check Yarn
+        if: matrix.package-manager == 'yarn'
+        run: npm install -g yarn
+
+      - name: Check Bun
+        if: matrix.package-manager == 'bun'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.1.26'
+
+      - name: Create Vue Project
+        run: |
+          mkdir ../test-repo
+          cd ../test-repo
+          if [ "${{ matrix.package-manager }}" == "pnpm" ]; then
+            yes "my-package" | head -n 1 | pnpm create vue@latest . --default --typescript
+            pnpm install
+          elif [ "${{ matrix.package-manager }}" == "yarn" ]; then
+            yes "my-package" | head -n 1 | yarn --cwd . create vue . --default --typescript
+            yarn --cwd . install
+          elif [ "${{ matrix.package-manager }}" == "bun" ]; then
+            yes "my-package" | head -n 1 | bun create vue . --default --typescript --cwd=. --ignore-scripts
+            bun install --cwd=. --ignore-scripts
+          else
+            yes "my-package" | head -n 1 | npm create vue@latest -- . --default --typescript
+            npm install
+          fi
+
+      - name: Vue Mess Detector Action
+        uses: ./ # Uses an action in the root directory
+        id: vmd
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          packageManager: ${{ matrix.package-manager }}
+          entryPoint: '../test-repo'
+          commentsEnabled: "false"
+

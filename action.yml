@@ -1,0 +1,40 @@
+name: "Vue Mess Detector"
+description:
+  "A static code analysis tool for detecting code smells and best practice
+  violations in Vue.js and Nuxt.js projects."
+branding:
+  icon: "code"
+  color: "green"
+inputs:
+  github-token:
+    description:
+      "GitHub token for commenting on pull requests/generating artifacts"
+    required: false
+  version:
+    description: "Version of Vue Mess Detector"
+    required: true
+    default: "latest"
+  skipInstall:
+    description: "Skip the installation of Vue Mess Detector"
+    required: true
+    default: "false"
+  commentsEnabled:
+    description: "Comment on Pull requests?"
+    required: true
+    default: "true"
+  packageManager:
+    description: "Package manager to use"
+    required: false
+  runArgs:
+    description: "Arguments to pass to Vue Mess Detector"
+    required: false
+  entryPoint:
+    description: "Entry point for Vue Mess Detector"
+    required: false
+  srcDir:
+    description: "Source directory to analyze"
+    required: true
+    default: "src/"
+runs:
+  using: "node20"
+  main: "dist/index.js"

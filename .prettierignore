@@ -1,0 +1,12 @@
+.pnpm-store/
+dist/
+node_modules/
+coverage/
+__tests__/
+.devcontainer/
+.github/
+badges/
+script/
+pnpm-lock.yaml
+.eslintrc.js
+*.md
