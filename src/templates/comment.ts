@@ -9,7 +9,7 @@ const comment: string = `
 {{coverageInfo}}
 {{artifactText}}
 
-_For any issues, please report them [here](https://github.com/TODO/TODO/issues) 🐞._
+_For any issues, please report them [here](https://github.com/brenoepics/vmd-action/issues) 🐞._
 `;
 
 const artifactText: string = `
