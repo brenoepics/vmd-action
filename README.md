@@ -13,6 +13,12 @@ violations in Vue.js and Nuxt.js projects._
 Easily integrate [Vue Mess Detector](https://github.com/rrd108/vue-mess-detector) into your CI pipeline to receive pull
 request alerts and display badges effortlessly.
 
+<details>
+<summary>Preview</summary>
+  
+  ![image](https://github.com/user-attachments/assets/975a8e08-ce7d-4b36-8f2d-3b16307a4d49)
+</details>
+
 ## Installation
 
 > [!TIP]
