@@ -16,7 +16,8 @@
     "package:watch": "pnpm run package --watch",
     "test": "pnpm jest --coverage --verbose",
     "prepublishOnly": "pnpm run clean && pnpm install && pnpm run build",
-    "preflight": "pnpm install && pnpm run format:write && pnpm run lint && pnpm run test && pnpm run package"
+    "preflight": "pnpm install && pnpm run format:write && pnpm run lint && pnpm run test && pnpm run package",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -65,6 +66,7 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
+    "husky": "9.1.6",
     "jest": "^29.7.0",
     "prettier": "^3.3.3",
     "rimraf": "6.0.1",
