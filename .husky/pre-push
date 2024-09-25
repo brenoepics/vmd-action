@@ -1,3 +1,9 @@
 pnpm preflight
-git add dist/
-git commit -m "chore: bump dist"
+
+# Check if there are any changes in the dist/ directory
+if [ -n "$(git status dist/ --porcelain)" ]; then
+  git add dist/
+  git commit -m "chore: update dist"
+else
+  echo "No changes in dist/ to commit."
+fi
