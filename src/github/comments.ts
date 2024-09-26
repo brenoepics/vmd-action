@@ -14,7 +14,7 @@ export async function commentOnPullRequest(
 
   if (core.getInput("github-token") === "") {
     throw new Error(
-      "Error: could not add a comment to pull request because github-token is missing!"
+      "Could not add a comment to pull request because github-token is missing!"
     );
   }
 
