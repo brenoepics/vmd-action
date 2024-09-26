@@ -5,7 +5,7 @@ import { GitHub } from "@actions/github/lib/utils.js";
 import { getCommentTemplate } from "../templates/comment.js";
 
 export async function commentOnPullRequest(
-  parsedOutput: VMDAnalysis,
+  analysis: VMDAnalysis,
   artifactId: number | undefined
 ): Promise<void> {
   if (!github.context.payload.pull_request) {
@@ -22,10 +22,7 @@ export async function commentOnPullRequest(
   const pull_number: number = github.context.payload.pull_request.number;
 
   try {
-    const commentBody: string = getCommentTemplate(
-      parsedOutput.codeHealthOutput,
-      artifactId
-    );
+    const commentBody: string = getCommentTemplate(analysis, artifactId);
     await octokit.rest.issues.createComment({
       owner,
       repo,

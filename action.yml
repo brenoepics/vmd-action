@@ -7,8 +7,7 @@ branding:
   color: "green"
 inputs:
   github-token:
-    description:
-      "GitHub token for commenting on pull requests/generating artifacts"
+    description: "GitHub token for commenting on pull requests"
     required: false
   version:
     description: "Version of Vue Mess Detector"
