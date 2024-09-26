@@ -17,7 +17,6 @@ Errors: {{errors}}
 Warnings: {{warnings}}
 Total Lines: {{linesCount}}
 Total Files: {{filesCount}}
-Points: {{points}}
 `;
 
 const artifactText: string = `
