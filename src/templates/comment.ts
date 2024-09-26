@@ -1,39 +1,70 @@
-import { CodeHealthOutputElement } from "../types.js";
+import { CodeHealth, VMDAnalysis } from "../types.js";
 import * as github from "@actions/github";
+import { getCoverageBadge } from "./badge.js";
 
 const comment: string = `
-## 🎉 Vue Mess Detector Analysis Results 🎉
+## 📊 Vue Mess Detector Analysis Results
 
-📊 **Coverage Information:**
-
+#### Code Health: {{coverageBadge}}
 {{coverageInfo}}
 {{artifactText}}
 
-_For any issues, please report them [here](https://github.com/brenoepics/vmd-action/issues) 🐞._
+###### For any issues, please [report them here](https://github.com/brenoepics/vmd-action/issues/).
+`;
+
+const coverageInfo: string = `
+Errors: {{errors}}
+Warnings: {{warnings}}
+Total Lines: {{linesCount}}
+Total Files: {{filesCount}}
+Points: {{points}}
 `;
 
 const artifactText: string = `
-🚀 The detailed coverage report has been successfully uploaded! You can access it [here](../actions/runs/{{runId}}/artifacts/{{artifactId}}) 🔗.
+[See analysis details here](../actions/runs/{{runId}}/artifacts/{{artifactId}})
 `;
 
-/**
- * TODO: this is a tweak to remove the progress,in the future would be great to have a fully parsed errors, warns... message.
- *
- */
-export function getCommentTemplate(
-  codeHealthOutput: CodeHealthOutputElement[],
-  artifactId: number | undefined
-): string {
-  const coverageInfo: string = codeHealthOutput
-    .filter((_, index) => index !== 1) // Skip the progress element (index 1)
-    .map(element => element.info)
-    .join("\n");
+function getCoverageInfo(result: VMDAnalysis) {
+  return result.codeHealthOutput.map(element => element.info).join("\n");
+}
 
-  return comment
+function replaceCodeHealth(message: string, health: CodeHealth) {
+  return message
     .replace(/{{coverageInfo}}/g, coverageInfo)
+    .replace(/{{errors}}/g, health.errors.toString())
+    .replace(/{{warnings}}/g, health.warnings.toString())
+    .replace(/{{linesCount}}/g, health.linesCount.toString())
+    .replace(/{{filesCount}}/g, health.filesCount.toString())
+    .replace(/{{points}}/g, health.points.toString());
+}
+
+function replaceRepoData(message: string, artifactId: number | undefined) {
+  return message
     .replace(/{{artifactText}}/g, artifactId ? artifactText : "")
     .replace(/{{artifactId}}/g, String(artifactId ?? 0))
     .replace(/{{runId}}/g, github.context.runId.toString())
     .replace(/{{repository/g, github.context.repo.repo)
     .replace(/{{repositoryOwner/g, github.context.repo.owner);
+}
+
+function replaceBadges(message: string, result: VMDAnalysis) {
+  return message.replace(
+    /{{coverageBadge}}/g,
+    getCoverageBadge(result.codeHealth?.points)
+  );
+}
+
+export function getCommentTemplate(
+  result: VMDAnalysis,
+  artifactId: number | undefined
+): string {
+  let message: string = replaceRepoData(comment, artifactId);
+  if (result.codeHealth) {
+    message = replaceCodeHealth(message, result.codeHealth);
+  } else {
+    message = message.replace(/{{coverageInfo}}/g, getCoverageInfo(result));
+  }
+
+  message = replaceBadges(message, result);
+  return message;
 }
