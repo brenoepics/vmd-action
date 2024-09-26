@@ -16,7 +16,8 @@ request alerts and display badges effortlessly.
 <details>
 <summary>Preview</summary>
 
-![image](https://github.com/user-attachments/assets/975a8e08-ce7d-4b36-8f2d-3b16307a4d49)
+![image](https://github.com/user-attachments/assets/aea8dbb9-49c8-4206-abba-9e4d475040ad)
+
 </details>
 
 ## Installation
