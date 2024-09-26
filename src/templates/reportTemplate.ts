@@ -37,5 +37,5 @@ function renderReportsByKey(key: string, value: ReportOutput[]) {
 const singleReport: (report: ReportOutput) => string = (
   report: ReportOutput
 ): string => {
-  return `  ${report.id}: ${report.message}\n`;
+  return `\n  ${report.id}: ${report.message}`;
 };
