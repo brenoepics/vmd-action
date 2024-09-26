@@ -35,15 +35,15 @@ export function buildBadgeUrl({
 
 function getHealthColor(percentage: number) {
   if (percentage < LOW_HEALTH_THRESHOLD) {
-    return "#ff0000";
+    return "#e74c3c";
   }
   if (percentage < MEDIUM_HEALTH_THRESHOLD) {
-    return "#ffbf00";
+    return "#f39c12";
   }
   if (percentage < OK_HEALTH_THRESHOLD) {
-    return "#007ec6";
+    return "#3498db";
   }
-  return "#21c542";
+  return "#2ecc71";
 }
 
 export function getCoverageBadge(
