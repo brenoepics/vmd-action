@@ -10,7 +10,7 @@ import { getReportTemplate } from "./reportTemplate.js";
 const commentTemplate: string = `
 ## 📊 Vue Mess Detector Analysis Results
 
-#### Code Health: {{coverageBadge}}
+#### {{coverageBadge}}
 {{coverageInfo}}
 
 {{reportBlock}}
