@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { VMDAnalysis } from "../types.js";
 import { GitHub } from "@actions/github/lib/utils.js";
-import { getCommentTemplate } from "../templates/comment.js";
+import { getCommentTemplate } from "../templates/commentTemplate.js";
 
 export async function commentOnPullRequest(
   analysis: VMDAnalysis,
