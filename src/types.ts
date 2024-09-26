@@ -14,7 +14,7 @@ export interface CodeHealth {
   warnings: number;
   linesCount: number;
   filesCount: number;
-  points: number;
+  points: number | null;
 }
 
 export interface CodeHealthOutputElement {

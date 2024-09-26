@@ -47,12 +47,12 @@ function getHealthColor(percentage: number) {
 }
 
 export function getCoverageBadge(
-  percentage: number | undefined | string
+  percentage: number | undefined | string | null
 ): string {
   let color: string = "blue";
   const label: string = "Code Health";
 
-  if (percentage === undefined) {
+  if (percentage === undefined || percentage == null) {
     percentage = "N/A";
     color = "#8c8c8c";
     core.warning(

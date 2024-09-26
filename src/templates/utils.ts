@@ -29,7 +29,7 @@ export function replaceCodeHealth(message: string, health: CodeHealth): string {
     .replace(/{{warnings}}/g, health.warnings.toLocaleString())
     .replace(/{{linesCount}}/g, health.linesCount.toLocaleString())
     .replace(/{{filesCount}}/g, health.filesCount.toLocaleString())
-    .replace(/{{points}}/g, health.points.toString());
+    .replace(/{{points}}/g, health.points ? health.points.toString() : "0");
 }
 
 export function replaceRepoData(

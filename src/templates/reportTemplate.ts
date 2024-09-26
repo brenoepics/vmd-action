@@ -1,6 +1,6 @@
 import { ReportOutput, VMDAnalysis } from "../types.js";
 import { getReportAsMap } from "./utils.js";
-
+import path from "node:path";
 const reportBlock: string = `
 <details>
   <summary>VMD Report</summary>
@@ -28,7 +28,14 @@ export function renderReport(analysis: {
   return outputList;
 }
 
+function isPath(key: string): boolean {
+  return path.isAbsolute(key) || key.includes(path.sep);
+}
+
 function renderReportsByKey(key: string, value: ReportOutput[]) {
+  if (isPath(key)) {
+    key = path.relative(process.cwd(), key);
+  }
   let output: string = `\n- ${key}:`;
   value.forEach(report => (output += singleReport(report)));
   return output;
@@ -37,5 +44,8 @@ function renderReportsByKey(key: string, value: ReportOutput[]) {
 const singleReport: (report: ReportOutput) => string = (
   report: ReportOutput
 ): string => {
+  if (isPath(report.id)) {
+    report.id = path.relative(process.cwd(), report.id);
+  }
   return `\n    ${report.id}: ${report.message}`;
 };
