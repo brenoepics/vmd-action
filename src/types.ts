@@ -25,4 +25,5 @@ export interface ReportOutput {
   id: string;
   description: string;
   message: string;
+  level?: string;
 }
