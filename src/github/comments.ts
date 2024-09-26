@@ -13,7 +13,9 @@ export async function commentOnPullRequest(
   }
 
   if (core.getInput("github-token") === "") {
-    throw new Error("No GitHub token found in the context!");
+    throw new Error(
+      "Error: could not add a comment to pull request because github-token is missing!"
+    );
   }
 
   const token: string = core.getInput("github-token");
@@ -30,8 +32,6 @@ export async function commentOnPullRequest(
       body: commentBody
     });
   } catch (error: unknown) {
-    core.setFailed(
-      `Failed to upload coverage artifact: ${(error as Error).message}`
-    );
+    core.setFailed("Failed to comment on pull request");
   }
 }
