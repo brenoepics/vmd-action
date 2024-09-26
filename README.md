@@ -31,7 +31,7 @@ Here's an example of how to
 use it:
 
 ```yml
-name: Vue Analysis
+name: VMD Analysis
 
 on:
   workflow_dispatch:
@@ -60,7 +60,7 @@ jobs:
           node-version: '20'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.1
+        uses: brenoepics/vmd-action@v0.0.2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # check inputs for full args list
@@ -77,16 +77,16 @@ artifacts.
 > [!TIP]
 > You can find the list of inputs and their descriptions in the [action.yml](action.yml) file.
 
-| Input           | Description                                  | Required | Default        |
-|-----------------|----------------------------------------------|----------|----------------|
-| github-token    | GitHub token for commenting on pull requests | false    |                |
-| version         | Version of Vue Mess Detector                 | true     | latest         |
-| skipInstall     | Skip the installation of Vue Mess Detector   | true     | false          |
-| commentsEnabled | Comment on Pull requests?                    | true     | true           |
-| packageManager  | Package manager to use                       | false    | (detect)       |
-| runArgs         | Arguments to pass to Vue Mess Detector       | false    | "--group=file" |
-| entryPoint      | Entry point for Vue Mess Detector            | false    | ./             |
-| srcDir          | Source directory to analyze                  | true     | src/           |
+| Input           | Description                                  | Required | Default                                                 |
+|-----------------|----------------------------------------------|----------|---------------------------------------------------------|
+| github-token    | GitHub token for commenting on pull requests | `false`  |                                                         |
+| version         | Version of Vue Mess Detector                 | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
+| skipInstall     | Skip the installation of Vue Mess Detector   | `true`   | `false`                                                 |
+| commentsEnabled | Comment on Pull requests?                    | `true`   | `true`                                                  |
+| packageManager  | Package manager to use                       | `false`  | (detect)                                                |
+| runArgs         | Arguments to pass to Vue Mess Detector       | `false`  | `--group=file`                                          |
+| entryPoint      | Entry point for Vue Mess Detector            | `false`  | `./`                                                    |
+| srcDir          | Source directory to analyze                  | `true`   | `src/`                                                  |
 
 ## Contributing
 
