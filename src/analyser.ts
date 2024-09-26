@@ -1,6 +1,6 @@
 import { detectManager, installPackage, runPackage } from "./packageManager.js";
 import * as core from "@actions/core";
-import { ActionInputs, getPath, isPullRequest } from "./utils.js";
+import { ActionInputs, getPath, isPullRequest } from "./github/utils.js";
 import { VMDAnalysis } from "./types.js";
 import fs from "node:fs";
 import { uploadOutputArtifact } from "./github/artifact.js";

@@ -1,4 +1,9 @@
 import * as core from "@actions/core";
+import {
+  LOW_HEALTH_THRESHOLD,
+  MEDIUM_HEALTH_THRESHOLD,
+  OK_HEALTH_THRESHOLD
+} from "../constants.js";
 
 const baseUrl: string = "https://img.shields.io/badge/";
 
@@ -24,7 +29,22 @@ export function buildBadgeUrl({
   labelColor,
   color
 }: BadgeOptions): string {
+  text = encodeURIComponent(text);
+  label = encodeURIComponent(label);
   return `${baseUrl}${text}-${text}?style=${style}&label=${encodeURIComponent(label)}&labelColor=${labelColor}&color=${color}`;
+}
+
+function getHealthColor(percentage: number) {
+  if (percentage < LOW_HEALTH_THRESHOLD) {
+    return "#ff0000";
+  }
+  if (percentage < MEDIUM_HEALTH_THRESHOLD) {
+    return "#ffbf00";
+  }
+  if (percentage < OK_HEALTH_THRESHOLD) {
+    return "#007ec6";
+  }
+  return "#21c542";
 }
 
 export function getCoverageBadge(
@@ -35,20 +55,14 @@ export function getCoverageBadge(
 
   if (percentage === undefined) {
     percentage = "N/A";
-    color = "lightgrey";
+    color = "#8c8c8c";
     core.warning(
       "No code health data found in the analysis output! you may need to update vue-mess-detector to >= 0.54.1"
     );
   }
 
   if (typeof percentage === "number") {
-    if (percentage < 40) {
-      color = "red";
-    } else if (percentage < 70) {
-      color = "yellow";
-    } else {
-      color = "green";
-    }
+    color = getHealthColor(percentage);
   }
 
   const badgeUrl: string = buildBadgeUrl({

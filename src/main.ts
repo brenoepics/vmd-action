@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import { runVueMessDetector } from "./analyser.js";
-import { ActionInputs, readActionInputs } from "./utils.js";
+import { ActionInputs, readActionInputs } from "./github/utils.js";
 
 /**
  * The main function for the action, which reads the inputs and runs the Vue Mess Detector.
