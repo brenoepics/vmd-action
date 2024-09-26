@@ -1,10 +1,11 @@
 import { detectManager, installPackage, runPackage } from "./packageManager.js";
 import * as core from "@actions/core";
-import { ActionInputs, getPath, isPullRequest } from "./utils.js";
+import { ActionInputs, getPath, isPullRequest } from "./github/utils.js";
 import { VMDAnalysis } from "./types.js";
 import fs from "node:fs";
 import { uploadOutputArtifact } from "./github/artifact.js";
 import { commentOnPullRequest } from "./github/comments.js";
+import { tagsRemover } from "./utils/constants.js";
 
 const coveragePath: string = "vmd-analysis.json";
 
@@ -63,9 +64,7 @@ export async function runVueMessDetector(input: ActionInputs): Promise<void> {
 export function parseAnalysisOutput(resultPath: string): VMDAnalysis {
   try {
     const fileContent: string = fs.readFileSync(resultPath, "utf-8");
-    const tagRegex: RegExp = /<[^>]+>/g;
-
-    const cleanedContent: string = fileContent.replace(tagRegex, "");
+    const cleanedContent: string = tagsRemover(fileContent);
     const parsedOutput: VMDAnalysis = JSON.parse(cleanedContent) as VMDAnalysis;
 
     core.info("Parsed output:");

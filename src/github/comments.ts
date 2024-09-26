@@ -2,7 +2,7 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { VMDAnalysis } from "../types.js";
 import { GitHub } from "@actions/github/lib/utils.js";
-import { getCommentTemplate } from "../templates/comment.js";
+import { getCommentTemplate } from "../templates/commentTemplate.js";
 
 export async function commentOnPullRequest(
   analysis: VMDAnalysis,
@@ -14,7 +14,7 @@ export async function commentOnPullRequest(
 
   if (core.getInput("github-token") === "") {
     throw new Error(
-      "Error: could not add a comment to pull request because github-token is missing!"
+      "Could not add a comment to pull request because github-token is missing!"
     );
   }
 

@@ -26,6 +26,7 @@ inputs:
     required: false
   runArgs:
     description: "Arguments to pass to Vue Mess Detector"
+    default: "--group=file"
     required: false
   entryPoint:
     description: "Entry point for Vue Mess Detector"
