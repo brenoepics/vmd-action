@@ -25,10 +25,10 @@ export function getCoverageInfo(result: VMDAnalysis): string {
 export function replaceCodeHealth(message: string, health: CodeHealth): string {
   return message
     .replace(/{{coverageInfo}}/g, coverageInfo)
-    .replace(/{{errors}}/g, health.errors.toString())
-    .replace(/{{warnings}}/g, health.warnings.toString())
-    .replace(/{{linesCount}}/g, health.linesCount.toString())
-    .replace(/{{filesCount}}/g, health.filesCount.toString())
+    .replace(/{{errors}}/g, health.errors.toLocaleString())
+    .replace(/{{warnings}}/g, health.warnings.toLocaleString())
+    .replace(/{{linesCount}}/g, health.linesCount.toLocaleString())
+    .replace(/{{filesCount}}/g, health.filesCount.toLocaleString())
     .replace(/{{points}}/g, health.points.toString());
 }
 
