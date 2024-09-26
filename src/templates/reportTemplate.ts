@@ -29,7 +29,7 @@ export function renderReport(analysis: {
 }
 
 function renderReportsByKey(key: string, value: ReportOutput[]) {
-  let output: string = `- ${key}:`;
+  let output: string = `\n- ${key}:`;
   value.forEach(report => (output += singleReport(report)));
   return output;
 }
