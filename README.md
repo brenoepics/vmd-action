@@ -87,6 +87,7 @@ artifacts.
 | runArgs         | Arguments to pass to Vue Mess Detector       | `false`  | `--group=file`                                          |
 | entryPoint      | Entry point for Vue Mess Detector            | `false`  | `./`                                                    |
 | srcDir          | Source directory to analyze                  | `true`   | `src/`                                                  |
+| deleteOldComments | Delete old VMD comments on pull requests?      | `false`  | `false`                                                 |
 
 ## Contributing
 
