@@ -24,6 +24,26 @@ export async function commentOnPullRequest(
   const pull_number: number = github.context.payload.pull_request.number;
 
   try {
+    const deleteOldComments: boolean =
+      core.getBooleanInput("deleteOldComments");
+    if (deleteOldComments) {
+      const { data: comments } = await octokit.rest.issues.listComments({
+        owner,
+        repo,
+        issue_number: pull_number
+      });
+
+      for (const comment of comments) {
+        if (comment.user?.login === github.context.actor) {
+          await octokit.rest.issues.deleteComment({
+            owner,
+            repo,
+            comment_id: comment.id
+          });
+        }
+      }
+    }
+
     const commentBody: string = getCommentTemplate(analysis, artifactId);
     await octokit.rest.issues.createComment({
       owner,
