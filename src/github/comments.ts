@@ -2,7 +2,32 @@ import * as github from "@actions/github";
 import * as core from "@actions/core";
 import { VMDAnalysis } from "../types.js";
 import { GitHub } from "@actions/github/lib/utils.js";
-import { getCommentTemplate } from "../templates/commentTemplate.js";
+import { getCommentTemplate, watermark } from "../templates/commentTemplate.js";
+
+async function deleteOldComments(
+  octokit: InstanceType<typeof GitHub>,
+  owner: string,
+  repo: string,
+  pull_number: number
+) {
+  const { data: comments } = await octokit.rest.issues.listComments({
+    owner,
+    repo,
+    issue_number: pull_number
+  });
+
+  for (const comment of comments) {
+    if (!comment.body?.startsWith(watermark)) {
+      continue;
+    }
+    core.debug(`Deleting comment ${comment.id.toString()}`);
+    await octokit.rest.issues.deleteComment({
+      owner,
+      repo,
+      comment_id: comment.id
+    });
+  }
+}
 
 export async function commentOnPullRequest(
   analysis: VMDAnalysis,
@@ -24,26 +49,6 @@ export async function commentOnPullRequest(
   const pull_number: number = github.context.payload.pull_request.number;
 
   try {
-    const deleteOldComments: boolean =
-      core.getBooleanInput("deleteOldComments");
-    if (deleteOldComments) {
-      const { data: comments } = await octokit.rest.issues.listComments({
-        owner,
-        repo,
-        issue_number: pull_number
-      });
-
-      for (const comment of comments) {
-        if (comment.user?.login === github.context.actor) {
-          await octokit.rest.issues.deleteComment({
-            owner,
-            repo,
-            comment_id: comment.id
-          });
-        }
-      }
-    }
-
     const commentBody: string = getCommentTemplate(analysis, artifactId);
     await octokit.rest.issues.createComment({
       owner,
@@ -51,6 +56,11 @@ export async function commentOnPullRequest(
       issue_number: pull_number,
       body: commentBody
     });
+
+    const deleteComments: boolean = core.getBooleanInput("deleteOldComments");
+    if (deleteComments) {
+      await deleteOldComments(octokit, owner, repo, pull_number);
+    }
   } catch (error: unknown) {
     core.setFailed("Failed to comment on pull request");
   }

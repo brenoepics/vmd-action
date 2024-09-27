@@ -7,7 +7,9 @@ import {
 } from "./utils.js";
 import { getReportTemplate } from "./reportTemplate.js";
 
-const commentTemplate: string = `
+export const watermark: string = `<!-- VMD Analysis Comment -->`;
+
+const commentTemplate: string = `${watermark}
 ## 📊 Vue Mess Detector Analysis Results
 
 #### {{coverageBadge}}
