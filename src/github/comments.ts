@@ -1,8 +1,7 @@
 import * as github from "@actions/github";
 import * as core from "@actions/core";
-import { VMDAnalysis } from "../types.js";
 import { GitHub } from "@actions/github/lib/utils.js";
-import { getCommentTemplate, watermark } from "../templates/commentTemplate.js";
+import { watermark } from "../templates/commentTemplate.js";
 
 async function deleteOldComments(
   octokit: InstanceType<typeof GitHub>,
@@ -29,10 +28,7 @@ async function deleteOldComments(
   }
 }
 
-export async function commentOnPullRequest(
-  analysis: VMDAnalysis,
-  artifactId: number | undefined
-): Promise<void> {
+export async function commentOnPullRequest(commentBody: string): Promise<void> {
   if (!github.context.payload.pull_request) {
     throw new Error("No pull request found in the context!");
   }
@@ -53,7 +49,6 @@ export async function commentOnPullRequest(
     if (deleteComments) {
       await deleteOldComments(octokit, owner, repo, pull_number);
     }
-    const commentBody: string = getCommentTemplate(analysis, artifactId);
     await octokit.rest.issues.createComment({
       owner,
       repo,

@@ -6,6 +6,7 @@ import fs from "node:fs";
 import { uploadOutputArtifact } from "./github/artifact.js";
 import { commentOnPullRequest } from "./github/comments.js";
 import { tagsRemover } from "./utils/constants.js";
+import { getCommentTemplate } from "./templates/commentTemplate.js";
 
 const coveragePath: string = "vmd-analysis.json";
 
@@ -49,12 +50,12 @@ export async function runVueMessDetector(input: ActionInputs): Promise<void> {
     core.debug(runOutput);
 
     const analysisOutput: VMDAnalysis = parseAnalysisOutput(coveragePath);
-
     const artifact: number | undefined =
       await uploadOutputArtifact(coveragePath);
-
+    const commentBody: string = getCommentTemplate(analysisOutput, artifact);
+    await core.summary.addRaw(commentBody).write();
     if (isPullRequest() && input.commentsEnabled) {
-      await commentOnPullRequest(analysisOutput, artifact);
+      await commentOnPullRequest(commentBody);
     }
   } catch (error: unknown) {
     core.setFailed(error instanceof Error ? error.message : "Unknown error");
