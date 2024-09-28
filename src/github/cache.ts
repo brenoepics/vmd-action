@@ -1,12 +1,14 @@
-import * as cache from "@actions/cache";
 import * as core from "@actions/core";
-import fs from "fs";
+import * as cache from "@actions/cache";
 import { VMDAnalysis } from "../types.js";
 import { parseAnalysisOutput } from "../helpers/parser.js";
 
-export async function saveCache(filePath: string, branch: string): Promise<void> {
-  const cacheId = `vmd-analysis-${branch}`;
-  const cachePaths = [filePath];
+export async function saveCache(
+  filePath: string,
+  branch: string
+): Promise<void> {
+  const cacheId: string = `vmd-analysis-${branch}`;
+  const cachePaths: string[] = [filePath];
   try {
     await cache.saveCache(cachePaths, cacheId);
   } catch (error) {
@@ -14,14 +16,18 @@ export async function saveCache(filePath: string, branch: string): Promise<void>
   }
 }
 
-export async function restoreCache(branch: string): Promise<VMDAnalysis | undefined> {
-  const cacheId = `vmd-analysis-${branch}`;
-  const cachePaths = ["vmd-analysis.json"];
+export async function restoreCache(
+  branch: string
+): Promise<VMDAnalysis | undefined> {
+  const cacheId: string = `vmd-analysis-${branch}`;
+  const cachePaths: string[] = ["vmd-analysis.json"];
   try {
-    const cacheKey = await cache.restoreCache(cachePaths, cacheId);
+    const cacheKey: string | undefined = await cache.restoreCache(
+      cachePaths,
+      cacheId
+    );
     if (cacheKey) {
-      const analysisOutput: VMDAnalysis | undefined = parseAnalysisOutput("vmd-analysis.json");
-      return analysisOutput;
+      return parseAnalysisOutput("vmd-analysis.json");
     }
   } catch (error) {
     core.warning(`Failed to restore cache: ${(error as Error).message}`);

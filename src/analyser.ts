@@ -10,11 +10,13 @@ import { uploadOutputArtifact } from "./github/artifact.js";
 import { commentOnPullRequest } from "./github/comments.js";
 import { getCommentTemplate } from "./templates/commentTemplate.js";
 import * as github from "@actions/github";
-import { parseAnalysisOutput } from "./helpers/parser.js";
+import {
+  compareAnalysisResults,
+  parseAnalysisOutput
+} from "./helpers/parser.js";
 import { runGroup } from "./helpers/group.js";
 import { REPORT_PATH } from "./helpers/constants.js";
-import { saveCache, restoreCache } from "./github/cache.js";
-import { compareAnalysisResults } from "./helpers/parser.js";
+import { restoreCache, saveCache } from "./github/cache.js";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -71,38 +73,51 @@ async function runAnalysisGroup(pkgManager: string, input: ActionInputs) {
   core.debug(runOutput);
 }
 
+async function commentFullReport(
+  analysisOutput: VMDAnalysis,
+  artifact: number,
+  input: ActionInputs
+) {
+  const commentBody: string = getCommentTemplate(analysisOutput, artifact);
+  await core.summary.addRaw(commentBody).write();
+  if (isPullRequest() && input.commentsEnabled)
+    await commentOnPullRequest(commentBody);
+}
+
+async function compareAnalysis(
+  input: ActionInputs,
+  analysisOutput: VMDAnalysis,
+  artifact: number
+) {
+  if (github.context.ref === `refs/heads/${input.compareWithBranch}`) {
+    await saveCache(REPORT_PATH, input.compareWithBranch);
+    await commentFullReport(analysisOutput, artifact, input);
+    return;
+  }
+
+  const mainBranchAnalysis: VMDAnalysis | undefined = await restoreCache(
+    input.compareWithBranch
+  );
+  if (!mainBranchAnalysis) {
+    await commentFullReport(analysisOutput, artifact, input);
+    return;
+  }
+  const newIssues: VMDAnalysis = compareAnalysisResults(
+    mainBranchAnalysis,
+    analysisOutput
+  );
+  const newIssuesCommentBody: string = getCommentTemplate(newIssues, artifact);
+  await core.summary.addRaw(newIssuesCommentBody).write();
+  if (isPullRequest() && input.commentsEnabled) {
+    await commentOnPullRequest(newIssuesCommentBody);
+  }
+}
+
 async function runUploadGroup(input: ActionInputs) {
   const analysisOutput: VMDAnalysis | undefined =
     parseAnalysisOutput(REPORT_PATH);
   const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
-  if (analysisOutput === undefined || artifact === undefined) {
-    return;
-  }
-  const commentBody: string = getCommentTemplate(analysisOutput, artifact);
-  await core.summary.addRaw(commentBody).write();
-  if (isPullRequest() && input.commentsEnabled) {
-    await commentOnPullRequest(commentBody);
-  }
-
-  if (github.context.ref === `refs/heads/${input.compareWithBranch}`) {
-    await saveCache(REPORT_PATH, input.compareWithBranch);
-  } else {
-    const mainBranchAnalysis: VMDAnalysis | undefined = await restoreCache(
-      input.compareWithBranch
-    );
-    if (mainBranchAnalysis) {
-      const newIssues: VMDAnalysis = compareAnalysisResults(
-        mainBranchAnalysis,
-        analysisOutput
-      );
-      const newIssuesCommentBody: string = getCommentTemplate(
-        newIssues,
-        artifact
-      );
-      await core.summary.addRaw(newIssuesCommentBody).write();
-      if (isPullRequest() && input.commentsEnabled) {
-        await commentOnPullRequest(newIssuesCommentBody);
-      }
-    }
+  if (!(analysisOutput === undefined || artifact === undefined)) {
+    await compareAnalysis(input, analysisOutput, artifact);
   }
 }

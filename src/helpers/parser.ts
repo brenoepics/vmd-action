@@ -1,4 +1,4 @@
-import { VMDAnalysis } from "../types.js";
+import { ReportOutput, VMDAnalysis } from "../types.js";
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { tagsRemover } from "./tags.js";
@@ -30,6 +30,28 @@ export function parseAnalysisOutput(
   }
 }
 
+function filterResults(
+  mainBranchAnalysis: VMDAnalysis,
+  file: string,
+  newIssues: VMDAnalysis,
+  issues: ReportOutput[]
+) {
+  const mainBranchIssues: ReportOutput[] =
+    mainBranchAnalysis.reportOutput[file].length > 0
+      ? mainBranchAnalysis.reportOutput[file]
+      : [];
+  const newFileIssues: ReportOutput[] = issues.filter(
+    issue =>
+      !mainBranchIssues.some(
+        mainIssue =>
+          mainIssue.id === issue.id && mainIssue.message === issue.message
+      )
+  );
+  if (newFileIssues.length > 0) {
+    newIssues.reportOutput[file] = newFileIssues;
+  }
+}
+
 /**
  * Compare the analysis results of the main branch and the pull request branch.
  * @param mainBranchAnalysis - The analysis results of the main branch.
@@ -48,21 +70,7 @@ export function compareAnalysisResults(
   };
 
   for (const [file, issues] of Object.entries(prBranchAnalysis.reportOutput)) {
-    if (!mainBranchAnalysis.reportOutput[file]) {
-      newIssues.reportOutput[file] = issues;
-    } else {
-      const mainBranchIssues = mainBranchAnalysis.reportOutput[file];
-      const newFileIssues = issues.filter(
-        issue =>
-          !mainBranchIssues.some(
-            mainIssue =>
-              mainIssue.id === issue.id && mainIssue.message === issue.message
-          )
-      );
-      if (newFileIssues.length > 0) {
-        newIssues.reportOutput[file] = newFileIssues;
-      }
-    }
+    filterResults(mainBranchAnalysis, file, newIssues, issues);
   }
 
   return newIssues;
