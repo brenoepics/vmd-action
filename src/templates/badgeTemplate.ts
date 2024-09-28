@@ -3,7 +3,7 @@ import {
   LOW_HEALTH_THRESHOLD,
   MEDIUM_HEALTH_THRESHOLD,
   OK_HEALTH_THRESHOLD
-} from "../utils/constants.js";
+} from "../helpers/constants.js";
 
 const baseUrl: string = "https://img.shields.io/badge/";
 

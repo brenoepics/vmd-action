@@ -1,14 +1,34 @@
-import { detectManager, installPackage, runPackage } from "./packageManager.js";
+import {
+  detectManager,
+  installPackage,
+  runPackage
+} from "./helpers/package.js";
 import * as core from "@actions/core";
 import { ActionInputs, getPath, isPullRequest } from "./github/utils.js";
 import { VMDAnalysis } from "./types.js";
-import fs from "node:fs";
 import { uploadOutputArtifact } from "./github/artifact.js";
 import { commentOnPullRequest } from "./github/comments.js";
-import { tagsRemover } from "./utils/constants.js";
 import { getCommentTemplate } from "./templates/commentTemplate.js";
+import * as github from "@actions/github";
+import { parseAnalysisOutput } from "./helpers/parser.js";
+import { runGroup } from "./helpers/group.js";
+import { REPORT_PATH } from "./helpers/constants.js";
 
-const coveragePath: string = "vmd-analysis.json";
+export async function runVueMessDetector(input: ActionInputs): Promise<void> {
+  if (input.skipBots && github.context.payload.sender?.type === "Bot") {
+    core.warning("Bot detected, skipping analysis!");
+    return;
+  }
+
+  const pkg: string = input.packageManager || detectManager();
+  await runGroup(`Install Vue Mess Detector with ${pkg}`, () =>
+    runInstallGroup(pkg, input)
+  );
+  await runGroup("Run Vue Mess Detector", () => runAnalysisGroup(pkg, input));
+  await runGroup("Upload Vue Mess Detector Report", () =>
+    runUploadGroup(input)
+  );
+}
 
 async function installVMD(
   skipInstall: boolean,
@@ -36,48 +56,29 @@ const runVMD: (pkgManager: string, input: ActionInputs) => Promise<string> = (
     getPath(input),
     ...input.runArgs.split(" "),
     "--output=json",
-    "--file-output=" + coveragePath
+    "--file-output=" + REPORT_PATH
   ]);
 
-export async function runVueMessDetector(input: ActionInputs): Promise<void> {
-  try {
-    const pkgManager: string = input.packageManager || detectManager();
-    core.info(`Detected package manager: ${pkgManager}`);
-
-    await installVMD(input.skipInstall, pkgManager, input.version);
-
-    const runOutput: string = await runVMD(pkgManager, input);
-    core.debug(runOutput);
-
-    const analysisOutput: VMDAnalysis = parseAnalysisOutput(coveragePath);
-    const artifact: number | undefined =
-      await uploadOutputArtifact(coveragePath);
-    const commentBody: string = getCommentTemplate(analysisOutput, artifact);
-    await core.summary.addRaw(commentBody).write();
-    if (isPullRequest() && input.commentsEnabled) {
-      await commentOnPullRequest(commentBody);
-    }
-  } catch (error: unknown) {
-    core.setFailed(error instanceof Error ? error.message : "Unknown error");
-  }
+async function runInstallGroup(pkgManager: string, input: ActionInputs) {
+  core.info(`Detected package manager: ${pkgManager}`);
+  await installVMD(input.skipInstall, pkgManager, input.version);
 }
 
-export function parseAnalysisOutput(resultPath: string): VMDAnalysis {
-  try {
-    const fileContent: string = fs.readFileSync(resultPath, "utf-8");
-    const cleanedContent: string = tagsRemover(fileContent);
-    const parsedOutput: VMDAnalysis = JSON.parse(cleanedContent) as VMDAnalysis;
+async function runAnalysisGroup(pkgManager: string, input: ActionInputs) {
+  const runOutput: string = await runVMD(pkgManager, input);
+  core.debug(runOutput);
+}
 
-    core.info("Parsed output:");
-    parsedOutput.codeHealthOutput.forEach(element => {
-      core.info(element.info);
-    });
-
-    return parsedOutput;
-  } catch (error: unknown) {
-    core.setFailed(
-      `Failed to parse analysis output: ${(error as Error).message}`
-    );
-    throw error;
+async function runUploadGroup(input: ActionInputs) {
+  const analysisOutput: VMDAnalysis | undefined =
+    parseAnalysisOutput(REPORT_PATH);
+  const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
+  if (analysisOutput === undefined || artifact === undefined) {
+    return;
+  }
+  const commentBody: string = getCommentTemplate(analysisOutput, artifact);
+  await core.summary.addRaw(commentBody).write();
+  if (isPullRequest() && input.commentsEnabled) {
+    await commentOnPullRequest(commentBody);
   }
 }

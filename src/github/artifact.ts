@@ -5,10 +5,11 @@ import {
   DefaultArtifactClient
 } from "@actions/artifact/lib/internal/client.js";
 
-function generateArtifactName() {
-  const randomHash: string = Math.random().toString(36).substring(2, 10);
-  const timestamp: number = Date.now();
-  return `vmd-report-${randomHash}-${timestamp.toString()}`;
+function generateArtifactName(): string {
+  const prefix: string = "vmd-report";
+  const randomHash: string = Math.floor(Math.random() * 1e8).toString();
+  const timestamp: string = Date.now().toString();
+  return `${prefix}-${randomHash}-${timestamp}`;
 }
 
 export async function uploadOutputArtifact(
