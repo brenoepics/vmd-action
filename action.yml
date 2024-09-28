@@ -43,6 +43,10 @@ inputs:
     description: "Delete old comments on pull requests?"
     required: false
     default: "false"
+  compareWithBranch:
+    description: "Branch to compare the analysis results with"
+    required: false
+    default: "main"
 runs:
   using: "node20"
   main: "dist/index.js"

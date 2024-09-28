@@ -29,3 +29,41 @@ export function parseAnalysisOutput(
     return undefined;
   }
 }
+
+/**
+ * Compare the analysis results of the main branch and the pull request branch.
+ * @param mainBranchAnalysis - The analysis results of the main branch.
+ * @param prBranchAnalysis - The analysis results of the pull request branch.
+ * @returns The new issues introduced by the pull request branch.
+ */
+export function compareAnalysisResults(
+  mainBranchAnalysis: VMDAnalysis,
+  prBranchAnalysis: VMDAnalysis
+): VMDAnalysis {
+  const newIssues: VMDAnalysis = {
+    output: [],
+    codeHealthOutput: [],
+    reportOutput: {},
+    codeHealth: prBranchAnalysis.codeHealth
+  };
+
+  for (const [file, issues] of Object.entries(prBranchAnalysis.reportOutput)) {
+    if (!mainBranchAnalysis.reportOutput[file]) {
+      newIssues.reportOutput[file] = issues;
+    } else {
+      const mainBranchIssues = mainBranchAnalysis.reportOutput[file];
+      const newFileIssues = issues.filter(
+        issue =>
+          !mainBranchIssues.some(
+            mainIssue =>
+              mainIssue.id === issue.id && mainIssue.message === issue.message
+          )
+      );
+      if (newFileIssues.length > 0) {
+        newIssues.reportOutput[file] = newFileIssues;
+      }
+    }
+  }
+
+  return newIssues;
+}

@@ -89,6 +89,7 @@ artifacts.
 | entryPoint        | Entry point for Vue Mess Detector                | `false`  | `./`                                                    |
 | srcDir            | Source directory to analyze                      | `true`   | `src/`                                                  |
 | deleteOldComments | Delete old VMD comments on pull requests?        | `false`  | `false`                                                 |
+| compareWithBranch | Branch to compare the analysis results with      | `false`  | `main`                                                  |
 
 ## Contributing
 

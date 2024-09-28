@@ -13,6 +13,8 @@ import * as github from "@actions/github";
 import { parseAnalysisOutput } from "./helpers/parser.js";
 import { runGroup } from "./helpers/group.js";
 import { REPORT_PATH } from "./helpers/constants.js";
+import { saveCache, restoreCache } from "./github/cache.js";
+import { compareAnalysisResults } from "./helpers/parser.js";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -80,5 +82,27 @@ async function runUploadGroup(input: ActionInputs) {
   await core.summary.addRaw(commentBody).write();
   if (isPullRequest() && input.commentsEnabled) {
     await commentOnPullRequest(commentBody);
+  }
+
+  if (github.context.ref === `refs/heads/${input.compareWithBranch}`) {
+    await saveCache(REPORT_PATH, input.compareWithBranch);
+  } else {
+    const mainBranchAnalysis: VMDAnalysis | undefined = await restoreCache(
+      input.compareWithBranch
+    );
+    if (mainBranchAnalysis) {
+      const newIssues: VMDAnalysis = compareAnalysisResults(
+        mainBranchAnalysis,
+        analysisOutput
+      );
+      const newIssuesCommentBody: string = getCommentTemplate(
+        newIssues,
+        artifact
+      );
+      await core.summary.addRaw(newIssuesCommentBody).write();
+      if (isPullRequest() && input.commentsEnabled) {
+        await commentOnPullRequest(newIssuesCommentBody);
+      }
+    }
   }
 }
