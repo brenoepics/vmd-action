@@ -29,7 +29,7 @@ export const coverageInfo: string = `
 `;
 
 export const artifactText: string = `
-🔍 [View Full Analysis Details](../actions/runs/{{runId}}/artifacts/{{artifactId}})
+🔍 [Download Full Analysis Details](../actions/runs/{{runId}}/artifacts/{{artifactId}})
 `;
 
 export function getCommentTemplate(
