@@ -24,6 +24,7 @@ export interface ActionInputs {
   entryPoint: string;
   srcDir: string;
   commentsEnabled: boolean;
+  skipBots: boolean;
 }
 
 export const readActionInputs: () => ActionInputs = (): ActionInputs => ({
@@ -33,5 +34,6 @@ export const readActionInputs: () => ActionInputs = (): ActionInputs => ({
   runArgs: core.getInput("runArgs", { required: false }),
   entryPoint: core.getInput("entryPoint", { required: false }),
   srcDir: core.getInput("srcDir", { required: false }),
-  commentsEnabled: core.getBooleanInput("commentsEnabled", { required: true })
+  commentsEnabled: core.getBooleanInput("commentsEnabled", { required: true }),
+  skipBots: core.getBooleanInput("skipBots", { required: true }),
 });

@@ -17,6 +17,10 @@ inputs:
     description: "Skip the installation of Vue Mess Detector"
     required: true
     default: "false"
+  skipBots:
+    description: "Skip analysis on pull requests from bots?"
+    required: true
+    default: "true"
   commentsEnabled:
     description: "Comment on Pull requests?"
     required: true

@@ -77,17 +77,18 @@ artifacts.
 > [!TIP]
 > You can find the list of inputs and their descriptions in the [action.yml](action.yml) file.
 
-| Input           | Description                                  | Required | Default                                                 |
-|-----------------|----------------------------------------------|----------|---------------------------------------------------------|
-| github-token    | GitHub token for commenting on pull requests | `false`  |                                                         |
-| version         | Version of Vue Mess Detector                 | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
-| skipInstall     | Skip the installation of Vue Mess Detector   | `true`   | `false`                                                 |
-| commentsEnabled | Comment on Pull requests?                    | `true`   | `true`                                                  |
-| packageManager  | Package manager to use                       | `false`  | (detect)                                                |
-| runArgs         | Arguments to pass to Vue Mess Detector       | `false`  | `--group=file`                                          |
-| entryPoint      | Entry point for Vue Mess Detector            | `false`  | `./`                                                    |
-| srcDir          | Source directory to analyze                  | `true`   | `src/`                                                  |
-| deleteOldComments | Delete old VMD comments on pull requests?      | `false`  | `false`                                                 |
+| Input             | Description                                      | Required | Default                                                 |
+|-------------------|--------------------------------------------------|----------|---------------------------------------------------------|
+| github-token      | GitHub token for commenting on pull requests     | `false`  |                                                         |
+| version           | Version of Vue Mess Detector                     | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
+| skipInstall       | Skip the installation of Vue Mess Detector       | `true`   | `false`                                                 |
+| skipBots          | Skip running analysis on pull requests from bots | `true`   | `true`                                                  |
+| commentsEnabled   | Comment on Pull requests?                        | `true`   | `true`                                                  |
+| packageManager    | Package manager to use                           | `false`  | (detect)                                                |
+| runArgs           | Arguments to pass to Vue Mess Detector           | `false`  | `--group=file`                                          |
+| entryPoint        | Entry point for Vue Mess Detector                | `false`  | `./`                                                    |
+| srcDir            | Source directory to analyze                      | `true`   | `src/`                                                  |
+| deleteOldComments | Delete old VMD comments on pull requests?        | `false`  | `false`                                                 |
 
 ## Contributing
 
