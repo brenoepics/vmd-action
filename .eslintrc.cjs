@@ -1,21 +1,16 @@
 module.exports = {
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/strict-type-checked", // Enable type checking, max strictness
-    "plugin:prettier/recommended" // prettier rules
+    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:prettier/recommended"
   ],
-
   parser: "@typescript-eslint/parser",
-
   parserOptions: {
-    project: true,
+    project: ["./tsconfig.json", "./tsconfig.eslint.json"],
     tsconfigRootDir: __dirname
   },
-
   plugins: ["@typescript-eslint"],
-
   root: true,
-
   ignorePatterns: [
     ".eslintrc.js",
     "*.spec.ts",
@@ -24,15 +19,13 @@ module.exports = {
     "coverage/",
     "lib/",
     "pnpm-lock.yaml",
-    ".pnpm-store/"
-  ], // ESLINT IGNORE
-
+    ".pnpm-store/",
+    "vitest.config.js"
+  ],
   env: {
-    // ESLINT ENV
     node: true,
     jest: true
   },
-
   rules: {
     "no-else-return": ["error", { allowElseIf: false }],
     "consistent-return": "error",

@@ -37,7 +37,7 @@ function isPath(key: string): boolean {
   return path.isAbsolute(key) || key.includes(path.sep);
 }
 
-function renderReportsByKey(key: string, value: ReportOutput[]) {
+export function renderReportsByKey(key: string, value: ReportOutput[]): string {
   if (isPath(key)) {
     key = path.relative(process.cwd(), key);
   }
