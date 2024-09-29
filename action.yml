@@ -44,7 +44,8 @@ inputs:
     required: false
     default: "false"
   relativeMode:
-    description: "Generate a report comparing the current branch with the target branch"
+    description:
+      "Generate a report comparing the current branch with the target branch"
     required: true
     default: "true"
 runs:
