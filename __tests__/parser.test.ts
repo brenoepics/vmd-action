@@ -13,7 +13,13 @@ describe("parseAnalysisOutput", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.defineProperty(core, "summary", {
+      value: { addRaw: vi.fn(), write: vi.fn() },
+      writable: true,
+      configurable: true
+    });
   });
+
 
   it("should parse analysis output successfully", () => {
     (fs.readFileSync as Mock).mockReturnValue(mockFileContent);

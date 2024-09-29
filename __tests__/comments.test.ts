@@ -20,7 +20,13 @@ describe("deleteOldComments", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    Object.defineProperty(core, "summary", {
+      value: { addRaw: vi.fn(), write: vi.fn() },
+      writable: true,
+      configurable: true
+    });
   });
+
 
   it("should delete old comments with watermark", async () => {
     const comments = [
@@ -84,6 +90,11 @@ describe("commentOnPullRequest", () => {
     (github.getOctokit as Mock).mockReturnValue(mockOctokit);
     (core.getInput as Mock).mockReturnValue("token");
     github.context.payload = { pull_request: { number: 1 } };
+    Object.defineProperty(core, "summary", {
+      value: { addRaw: vi.fn(), write: vi.fn() },
+      writable: true,
+      configurable: true
+    });
     Object.defineProperty(github.context, "repo", {
       value: { owner: "owner", repo: "repo" },
       writable: true
