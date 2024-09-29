@@ -17,6 +17,7 @@ request alerts and display badges effortlessly.
 <summary>Preview</summary>
 
 ![image](https://github.com/user-attachments/assets/aea8dbb9-49c8-4206-abba-9e4d475040ad)
+![img.png](preview.png)
 
 </details>
 
@@ -60,7 +61,7 @@ jobs:
           node-version: '20'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.3
+        uses: brenoepics/vmd-action@v0.0.4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # check inputs for full args list
@@ -77,19 +78,19 @@ artifacts.
 > [!TIP]
 > You can find the list of inputs and their descriptions in the [action.yml](action.yml) file.
 
-| Input             | Description                                      | Required | Default                                                 |
-|-------------------|--------------------------------------------------|----------|---------------------------------------------------------|
-| github-token      | GitHub token for commenting on pull requests     | `false`  |                                                         |
-| version           | Version of Vue Mess Detector                     | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
-| skipInstall       | Skip the installation of Vue Mess Detector       | `true`   | `false`                                                 |
-| skipBots          | Skip running analysis on pull requests from bots | `true`   | `true`                                                  |
-| commentsEnabled   | Comment on Pull requests?                        | `true`   | `true`                                                  |
-| packageManager    | Package manager to use                           | `false`  | (detect)                                                |
-| runArgs           | Arguments to pass to Vue Mess Detector           | `false`  | `--group=file`                                          |
-| entryPoint        | Entry point for Vue Mess Detector                | `false`  | `./`                                                    |
-| srcDir            | Source directory to analyze                      | `true`   | `src/`                                                  |
-| deleteOldComments | Delete old VMD comments on pull requests?        | `false`  | `false`                                                 |
-| compareWithBranch | Branch to compare the analysis results with      | `false`  | `main`                                                  |
+| Input             | Description                                          | Required | Default                                                 |
+|-------------------|------------------------------------------------------|----------|---------------------------------------------------------|
+| github-token      | GitHub token for commenting on pull requests         | `false`  |                                                         |
+| version           | Version of Vue Mess Detector                         | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
+| skipInstall       | Skip the installation of Vue Mess Detector           | `true`   | `false`                                                 |
+| skipBots          | Skip running analysis on pull requests from bots     | `true`   | `true`                                                  |
+| commentsEnabled   | Comment on Pull requests?                            | `true`   | `true`                                                  |
+| packageManager    | Package manager to use                               | `false`  | (detect)                                                |
+| runArgs           | Arguments to pass to Vue Mess Detector               | `false`  | `--group=file`                                          |
+| entryPoint        | Entry point for Vue Mess Detector                    | `false`  | `./`                                                    |
+| srcDir            | Source directory to analyze                          | `true`   | `src/`                                                  |
+| deleteOldComments | Delete old report comments on pull requests?         | `false`  | `false`                                                 |
+| relativeMode      | Compare the current branch with the target (PR only) | `true`   | `true`                                                  |
 
 ## Contributing
 
