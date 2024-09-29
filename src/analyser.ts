@@ -98,20 +98,19 @@ async function handleResult(
 
     if (!baseAnalysis) {
       await commentFullReport(analysisOutput, artifact, input);
-      return;
-    }
-
-    const newIssues: VMDAnalysis = compareAnalysisResults(
-      baseAnalysis,
-      analysisOutput
-    );
-    const newIssuesCommentBody: string = getCommentTemplate(
-      newIssues,
-      artifact
-    );
-    await core.summary.addRaw(newIssuesCommentBody).write();
-    if (input.commentsEnabled) {
-      await commentOnPullRequest(newIssuesCommentBody);
+    } else {
+      const newIssues: VMDAnalysis = compareAnalysisResults(
+        baseAnalysis,
+        analysisOutput
+      );
+      const newIssuesCommentBody: string = getCommentTemplate(
+        newIssues,
+        artifact
+      );
+      await core.summary.addRaw(newIssuesCommentBody).write();
+      if (input.commentsEnabled) {
+        await commentOnPullRequest(newIssuesCommentBody);
+      }
     }
   }
 
