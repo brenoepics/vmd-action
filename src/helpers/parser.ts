@@ -34,8 +34,8 @@ export function parseAnalysisOutput(
 const filterIssues: (
   baseIssues: ReportOutput[]
 ) => (issue: ReportOutput) => boolean =
-  (baseIssues: ReportOutput[]) => (issue: ReportOutput) =>
-    !baseIssues.some(
+  (baseIssues?: ReportOutput[]) => (issue: ReportOutput) =>
+    !baseIssues?.some(
       mainIssue =>
         mainIssue.id === issue.id && mainIssue.message === issue.message
     );
@@ -63,12 +63,8 @@ function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
   codeHealth.warnings -= baseHealth.warnings;
   codeHealth.linesCount -= baseHealth.linesCount;
   codeHealth.filesCount -= baseHealth.filesCount;
-  codeHealth.points = Math.ceil(
-    (1 -
-      (baseHealth.errors * ERROR_WEIGHT + baseHealth.warnings) /
-        baseHealth.linesCount) *
-      100
-  );
+  const points: number = codeHealth.errors * ERROR_WEIGHT + codeHealth.warnings;
+  codeHealth.points = Math.ceil((1 - points / codeHealth.linesCount) * 100);
 
   return codeHealth;
 }
