@@ -1,13 +1,12 @@
 import * as github from "@actions/github";
-import * as core from "@actions/core";
 import { GitHub } from "@actions/github/lib/utils.js";
 import { commentOnPullRequest, deleteOldComments } from "../src/github/comments.js";
 import { watermark } from "../src/templates/commentTemplate.js";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
+import * as core from "@actions/core";
 
 vi.mock("@actions/github");
 vi.mock("@actions/core");
-
 describe("deleteOldComments", () => {
   const mockOctokit = {
     rest: {
@@ -20,11 +19,6 @@ describe("deleteOldComments", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    Object.defineProperty(core, "summary", {
-      value: { addRaw: vi.fn(), write: vi.fn() },
-      writable: true,
-      configurable: true
-    });
   });
 
 
@@ -88,13 +82,7 @@ describe("commentOnPullRequest", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (github.getOctokit as Mock).mockReturnValue(mockOctokit);
-    (core.getInput as Mock).mockReturnValue("token");
     github.context.payload = { pull_request: { number: 1 } };
-    Object.defineProperty(core, "summary", {
-      value: { addRaw: vi.fn(), write: vi.fn() },
-      writable: true,
-      configurable: true
-    });
     Object.defineProperty(github.context, "repo", {
       value: { owner: "owner", repo: "repo" },
       writable: true
@@ -102,6 +90,7 @@ describe("commentOnPullRequest", () => {
   });
 
   it("should create a comment on pull request", async () => {
+    (core.getInput as Mock).mockReturnValue("token");
     await commentOnPullRequest("Test comment");
 
     expect(mockOctokit.rest.issues.createComment).toHaveBeenCalledWith({
@@ -122,7 +111,6 @@ describe("commentOnPullRequest", () => {
 
   it("should throw an error if github-token is missing", async () => {
     (core.getInput as Mock).mockReturnValue("");
-
     await expect(commentOnPullRequest("Test comment")).rejects.toThrow(
       "Could not add a comment to pull request because github-token is missing!"
     );
