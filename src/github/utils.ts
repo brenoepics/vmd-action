@@ -25,7 +25,7 @@ export interface ActionInputs {
   srcDir: string;
   commentsEnabled: boolean;
   skipBots: boolean;
-  compareWithBranch: string;
+  relativeMode: boolean;
 }
 
 export const readActionInputs: () => ActionInputs = (): ActionInputs => ({
@@ -37,6 +37,5 @@ export const readActionInputs: () => ActionInputs = (): ActionInputs => ({
   srcDir: core.getInput("srcDir", { required: false }),
   commentsEnabled: core.getBooleanInput("commentsEnabled", { required: true }),
   skipBots: core.getBooleanInput("skipBots", { required: true }),
-  compareWithBranch:
-    core.getInput("compareWithBranch", { required: false }) || "main"
+  relativeMode: core.getBooleanInput("relativeMode", { required: true })
 });

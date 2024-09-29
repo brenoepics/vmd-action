@@ -84,32 +84,65 @@ async function commentFullReport(
     await commentOnPullRequest(commentBody);
 }
 
-async function compareAnalysis(
+async function handleResult(
   input: ActionInputs,
   analysisOutput: VMDAnalysis,
   artifact: number
 ) {
-  if (github.context.ref === `refs/heads/${input.compareWithBranch}`) {
-    await saveCache(REPORT_PATH, input.compareWithBranch);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const sourceBranch: string =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    github.context.payload.pull_request?.head.ref.replace("refs/heads/", "");
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const targetBranch: string =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+    github.context.payload.pull_request?.base.ref.replace("refs/heads/", "");
+  const isBaseBranch: boolean =
+    github.context.ref === `refs/heads/${targetBranch}`;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const isFork: boolean =
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    github.context.payload.pull_request?.head.repo.fork ?? true;
+
+  if (isPullRequest()) {
+    let mainBranchAnalysis: VMDAnalysis | undefined;
+
+    if (isFork) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const baseBranch: string =
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
+        github.context.payload.pull_request?.base.ref.replace(
+          "refs/heads/",
+          ""
+        );
+      mainBranchAnalysis = await restoreCache(baseBranch);
+    } else {
+      mainBranchAnalysis = await restoreCache(sourceBranch);
+    }
+
+    if (!mainBranchAnalysis) {
+      await commentFullReport(analysisOutput, artifact, input);
+      return;
+    }
+
+    const newIssues: VMDAnalysis = compareAnalysisResults(
+      mainBranchAnalysis,
+      analysisOutput
+    );
+    const newIssuesCommentBody: string = getCommentTemplate(
+      newIssues,
+      artifact
+    );
+    await core.summary.addRaw(newIssuesCommentBody).write();
+    if (input.commentsEnabled) {
+      await commentOnPullRequest(newIssuesCommentBody);
+    }
+  } else {
     await commentFullReport(analysisOutput, artifact, input);
-    return;
   }
 
-  const mainBranchAnalysis: VMDAnalysis | undefined = await restoreCache(
-    input.compareWithBranch
-  );
-  if (!mainBranchAnalysis) {
-    await commentFullReport(analysisOutput, artifact, input);
-    return;
-  }
-  const newIssues: VMDAnalysis = compareAnalysisResults(
-    mainBranchAnalysis,
-    analysisOutput
-  );
-  const newIssuesCommentBody: string = getCommentTemplate(newIssues, artifact);
-  await core.summary.addRaw(newIssuesCommentBody).write();
-  if (isPullRequest() && input.commentsEnabled) {
-    await commentOnPullRequest(newIssuesCommentBody);
+  if (isBaseBranch && !isFork) {
+    await saveCache(REPORT_PATH, sourceBranch);
   }
 }
 
@@ -118,6 +151,6 @@ async function runUploadGroup(input: ActionInputs) {
     parseAnalysisOutput(REPORT_PATH);
   const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
   if (!(analysisOutput === undefined || artifact === undefined)) {
-    await compareAnalysis(input, analysisOutput, artifact);
+    await handleResult(input, analysisOutput, artifact);
   }
 }

@@ -1,6 +1,7 @@
 import { ReportOutput, VMDAnalysis } from "../types.js";
 import { getReportAsMap } from "./utils.js";
 import path from "node:path";
+
 const reportBlock: string = `
 <details>
   <summary>VMD Report</summary>
@@ -11,6 +12,10 @@ const reportBlock: string = `
 `;
 
 export function getReportTemplate(analysis: VMDAnalysis): string {
+  const report: string = renderReport(analysis.reportOutput);
+  if (report === "") {
+    return "";
+  }
   const codeBlock: string = `\`\`\`\n${renderReport(analysis.reportOutput)}\n\`\`\``;
   return reportBlock.replace(/{{outputList}}/g, codeBlock);
 }

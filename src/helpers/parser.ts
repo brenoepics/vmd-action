@@ -1,7 +1,8 @@
-import { ReportOutput, VMDAnalysis } from "../types.js";
+import { CodeHealth, ReportOutput, VMDAnalysis } from "../types.js";
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { tagsRemover } from "./tags.js";
+import { EMPTY_REPORT, ERROR_WEIGHT } from "./constants.js";
 
 /**
  * Parse the analysis output from the file system.
@@ -30,6 +31,15 @@ export function parseAnalysisOutput(
   }
 }
 
+const filterIssues: (
+  baseIssues: ReportOutput[]
+) => (issue: ReportOutput) => boolean =
+  (baseIssues: ReportOutput[]) => (issue: ReportOutput) =>
+    !baseIssues.some(
+      mainIssue =>
+        mainIssue.id === issue.id && mainIssue.message === issue.message
+    );
+
 function filterResults(
   mainBranchAnalysis: VMDAnalysis,
   file: string,
@@ -37,19 +47,30 @@ function filterResults(
   issues: ReportOutput[]
 ) {
   const mainBranchIssues: ReportOutput[] =
-    mainBranchAnalysis.reportOutput[file].length > 0
-      ? mainBranchAnalysis.reportOutput[file]
-      : [];
+    mainBranchAnalysis.reportOutput[file];
   const newFileIssues: ReportOutput[] = issues.filter(
-    issue =>
-      !mainBranchIssues.some(
-        mainIssue =>
-          mainIssue.id === issue.id && mainIssue.message === issue.message
-      )
+    filterIssues(mainBranchIssues)
   );
   if (newFileIssues.length > 0) {
     newIssues.reportOutput[file] = newFileIssues;
   }
+}
+
+function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
+  const codeHealth: CodeHealth = prHealth;
+
+  codeHealth.errors -= baseHealth.errors;
+  codeHealth.warnings -= baseHealth.warnings;
+  codeHealth.linesCount -= baseHealth.linesCount;
+  codeHealth.filesCount -= baseHealth.filesCount;
+  codeHealth.points = Math.ceil(
+    (1 -
+      (baseHealth.errors * ERROR_WEIGHT + baseHealth.warnings) /
+        baseHealth.linesCount) *
+      100
+  );
+
+  return codeHealth;
 }
 
 /**
@@ -66,12 +87,22 @@ export function compareAnalysisResults(
     output: [],
     codeHealthOutput: [],
     reportOutput: {},
-    codeHealth: prBranchAnalysis.codeHealth
+    codeHealth: EMPTY_REPORT
   };
-
   for (const [file, issues] of Object.entries(prBranchAnalysis.reportOutput)) {
     filterResults(mainBranchAnalysis, file, newIssues, issues);
   }
 
+  if (
+    prBranchAnalysis.codeHealth === undefined ||
+    mainBranchAnalysis.codeHealth === undefined
+  ) {
+    return newIssues;
+  }
+
+  newIssues.codeHealth = getRelativeHealth(
+    prBranchAnalysis.codeHealth,
+    mainBranchAnalysis.codeHealth
+  );
   return newIssues;
 }
