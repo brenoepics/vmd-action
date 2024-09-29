@@ -21,7 +21,7 @@ export function getReportTemplate(analysis: VMDAnalysis): string {
 }
 
 export function renderReport(analysis: {
-  [key: string]: ReportOutput[];
+  [p: string]: ReportOutput[] | undefined;
 }): string {
   let outputList: string = "";
   const res: Map<string, ReportOutput[]> = getReportAsMap(analysis);

@@ -4,7 +4,7 @@ import { artifactText } from "./commentTemplate.js";
 import { getCoverageBadge } from "./badgeTemplate.js";
 
 export function getReportAsMap(report: {
-  [key: string]: ReportOutput[];
+  [p: string]: ReportOutput[] | undefined;
 }): Map<string, ReportOutput[]> {
   const reportOutputMap: Map<string, ReportOutput[]> = new Map<
     string,
@@ -12,7 +12,9 @@ export function getReportAsMap(report: {
   >();
 
   for (const [parent, outputs] of Object.entries(report)) {
-    reportOutputMap.set(parent, outputs);
+    if (outputs) {
+      reportOutputMap.set(parent, outputs);
+    }
   }
 
   return reportOutputMap;
