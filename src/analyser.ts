@@ -17,7 +17,7 @@ import {
 import { runGroup } from "./helpers/group.js";
 import { REPORT_PATH } from "./helpers/constants.js";
 import { restoreCache, saveCache } from "./github/cache.js";
-import { baseBranch, isBaseBranch, sourceBranch } from "./github/context.js";
+import { baseBranch, sourceBranch } from "./github/context.js";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -114,7 +114,7 @@ async function handleResult(
     }
   }
 
-  if (isBaseBranch && !isPullRequest()) {
+  if (!isPullRequest()) {
     await saveCache(REPORT_PATH, sourceBranch);
   }
 }
