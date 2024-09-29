@@ -1,11 +1,11 @@
 import { parseAnalysisOutput, compareAnalysisResults } from "../src/helpers/parser.js";
-import * as core from "@actions/core";
 import fs from "node:fs";
 import { VMDAnalysis } from "../src/types.js";
 import { describe, expect, it, vi, beforeEach, Mock } from "vitest";
+import * as core from "@actions/core";
 
-vi.mock("@actions/core");
 vi.mock("node:fs");
+vi.spyOn(core, "setFailed");
 
 describe("parseAnalysisOutput", () => {
   const resultPath = "vmd-analysis.json";
@@ -14,6 +14,7 @@ describe("parseAnalysisOutput", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
+
 
   it("should parse analysis output successfully", () => {
     (fs.readFileSync as Mock).mockReturnValue(mockFileContent);

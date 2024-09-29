@@ -6,7 +6,6 @@ import { describe, expect, it, Mock, vi } from "vitest";
 
 vi.mock("@actions/core");
 vi.mock("@actions/github");
-
 describe("isPullRequest", () => {
   it("should return true if the context is a pull request", () => {
     github.context.payload = { pull_request: {number: 1} };
