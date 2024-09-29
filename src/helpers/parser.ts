@@ -39,7 +39,7 @@ function filterResults(
 ) {
   const oldIssues: ReportOutput[] = oldAnalysis.reportOutput[file] || [];
   const onlyNewIssues: ReportOutput[] | undefined = issues?.filter(issue => {
-    return !oldIssues.some(oldIssue => oldIssue.id === issue.id);
+    return oldIssues.some(oldIssue => oldIssue.id === issue.id);
   });
   if (onlyNewIssues && onlyNewIssues.length > 0) {
     newIssues.reportOutput[file] = onlyNewIssues;
