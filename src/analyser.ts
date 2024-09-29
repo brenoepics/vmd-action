@@ -39,11 +39,11 @@ export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   );
 }
 
-async function installVMD(
+export async function installVMD(
   skipInstall: boolean,
   pkgManager: string,
   version: string
-) {
+): Promise<void> {
   if (skipInstall) {
     core.info("Skipping installation of vue-mess-detector!");
     return;
@@ -56,10 +56,10 @@ async function installVMD(
   core.debug(stdout);
 }
 
-const runVMD: (pkgManager: string, input: ActionInputs) => Promise<string> = (
+export const runVMD: (
   pkgManager: string,
   input: ActionInputs
-) =>
+) => Promise<string> = (pkgManager: string, input: ActionInputs) =>
   runPackage(pkgManager, "vue-mess-detector", [
     "analyze",
     getPath(input),
@@ -77,22 +77,22 @@ async function runAnalysisGroup(pkgManager: string, input: ActionInputs) {
   core.debug(runOutput);
 }
 
-async function commentFullReport(
+export async function commentFullReport(
   analysisOutput: VMDAnalysis,
   artifact: number,
   input: ActionInputs
-) {
+): Promise<void> {
   const commentBody: string = getCommentTemplate(analysisOutput, artifact);
   await core.summary.addRaw(commentBody).write();
   if (IS_PULL_REQUEST && input.commentsEnabled)
     await commentOnPullRequest(commentBody);
 }
 
-async function handleResult(
+export async function handleResult(
   input: ActionInputs,
   analysisOutput: VMDAnalysis,
   artifact: number
-) {
+): Promise<void> {
   if (!IS_PULL_REQUEST) {
     await saveCache(REPORT_PATH, CURRENT_BRANCH);
     await commentFullReport(analysisOutput, artifact, input);

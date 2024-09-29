@@ -1,24 +1,25 @@
 import * as github from "@actions/github";
 import * as core from "@actions/core";
-import { GitHub } from "@actions/github/lib/utils";
-import { commentOnPullRequest } from "../src/github/comments";
-import { watermark } from "../src/templates/commentTemplate";
+import { GitHub } from "@actions/github/lib/utils.js";
+import { commentOnPullRequest, deleteOldComments } from "../src/github/comments.js";
+import { watermark } from "../src/templates/commentTemplate.js";
+import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 
-jest.mock("@actions/github");
-jest.mock("@actions/core");
+vi.mock("@actions/github");
+vi.mock("@actions/core");
 
 describe("deleteOldComments", () => {
   const mockOctokit = {
     rest: {
       issues: {
-        listComments: jest.fn(),
-        deleteComment: jest.fn()
+        listComments: vi.fn(),
+        deleteComment: vi.fn()
       }
     }
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should delete old comments with watermark", async () => {
@@ -26,7 +27,7 @@ describe("deleteOldComments", () => {
       { id: 1, body: `${watermark} Old comment` },
       { id: 2, body: "Some other comment" }
     ];
-    (mockOctokit.rest.issues.listComments as jest.Mock).mockResolvedValue({
+    (mockOctokit.rest.issues.listComments as Mock).mockResolvedValue({
       data: comments
     });
 
@@ -54,7 +55,7 @@ describe("deleteOldComments", () => {
       { id: 1, body: "Some other comment" },
       { id: 2, body: "Another comment" }
     ];
-    (mockOctokit.rest.issues.listComments as jest.Mock).mockResolvedValue({
+    (mockOctokit.rest.issues.listComments as Mock).mockResolvedValue({
       data: comments
     });
 
@@ -73,17 +74,20 @@ describe("commentOnPullRequest", () => {
   const mockOctokit = {
     rest: {
       issues: {
-        createComment: jest.fn()
+        createComment: vi.fn()
       }
     }
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (github.getOctokit as jest.Mock).mockReturnValue(mockOctokit);
-    (core.getInput as jest.Mock).mockReturnValue("token");
+    vi.clearAllMocks();
+    (github.getOctokit as Mock).mockReturnValue(mockOctokit);
+    (core.getInput as Mock).mockReturnValue("token");
     github.context.payload = { pull_request: { number: 1 } };
-    github.context.repo = { owner: "owner", repo: "repo" };
+    Object.defineProperty(github.context, "repo", {
+      value: { owner: "owner", repo: "repo" },
+      writable: true
+    });
   });
 
   it("should create a comment on pull request", async () => {
@@ -106,7 +110,7 @@ describe("commentOnPullRequest", () => {
   });
 
   it("should throw an error if github-token is missing", async () => {
-    (core.getInput as jest.Mock).mockReturnValue("");
+    (core.getInput as Mock).mockReturnValue("");
 
     await expect(commentOnPullRequest("Test comment")).rejects.toThrow(
       "Could not add a comment to pull request because github-token is missing!"

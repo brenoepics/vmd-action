@@ -3,12 +3,12 @@ import * as core from "@actions/core";
 import { GitHub } from "@actions/github/lib/utils.js";
 import { watermark } from "../templates/commentTemplate.js";
 
-async function deleteOldComments(
+export async function deleteOldComments(
   octokit: InstanceType<typeof GitHub>,
   owner: string,
   repo: string,
   pull_number: number
-) {
+): Promise<void> {
   const { data: comments } = await octokit.rest.issues.listComments({
     owner,
     repo,

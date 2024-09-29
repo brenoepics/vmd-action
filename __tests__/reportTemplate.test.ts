@@ -1,5 +1,6 @@
-import { getReportTemplate, renderReport, renderReportsByKey } from "../src/templates/reportTemplate";
-import { VMDAnalysis, ReportOutput } from "../src/types";
+import { getReportTemplate, renderReport, renderReportsByKey } from "../src/templates/reportTemplate.js";
+import { VMDAnalysis, ReportOutput } from "../src/types.js";
+import { describe, expect, it } from "vitest";
 
 describe("getReportTemplate", () => {
   const analysisOutput: VMDAnalysis = {

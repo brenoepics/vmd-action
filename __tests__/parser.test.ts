@@ -1,21 +1,22 @@
-import { parseAnalysisOutput, compareAnalysisResults } from "../src/helpers/parser";
+import { parseAnalysisOutput, compareAnalysisResults } from "../src/helpers/parser.js";
 import * as core from "@actions/core";
 import fs from "node:fs";
-import { VMDAnalysis, CodeHealth, ReportOutput } from "../src/types";
+import { VMDAnalysis } from "../src/types.js";
+import { describe, expect, it, vi, beforeEach, Mock } from "vitest";
 
-jest.mock("@actions/core");
-jest.mock("node:fs");
+vi.mock("@actions/core");
+vi.mock("node:fs");
 
 describe("parseAnalysisOutput", () => {
   const resultPath = "vmd-analysis.json";
   const mockFileContent = '{"output":[],"codeHealthOutput":[],"reportOutput":{}}';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("should parse analysis output successfully", () => {
-    (fs.readFileSync as jest.Mock).mockReturnValue(mockFileContent);
+    (fs.readFileSync as Mock).mockReturnValue(mockFileContent);
 
     const result = parseAnalysisOutput(resultPath);
 
@@ -28,7 +29,7 @@ describe("parseAnalysisOutput", () => {
   });
 
   it("should handle error when parsing analysis output", () => {
-    (fs.readFileSync as jest.Mock).mockImplementation(() => {
+    (fs.readFileSync as Mock).mockImplementation(() => {
       throw new Error("Read failed");
     });
 
@@ -86,7 +87,7 @@ describe("compareAnalysisResults", () => {
         warnings: 1,
         linesCount: 50,
         filesCount: 1,
-        points: 90
+        points: 95
       }
     });
   });

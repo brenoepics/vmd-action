@@ -1,10 +1,11 @@
-import { isPullRequest, getPath, readActionInputs, ActionInputs } from "../src/github/utils";
+import { isPullRequest, getPath, readActionInputs, ActionInputs } from "../src/github/utils.js";
 import * as core from "@actions/core";
 import * as github from "@actions/github";
 import Path from "node:path";
+import { describe, expect, it, Mock, vi } from "vitest";
 
-jest.mock("@actions/core");
-jest.mock("@actions/github");
+vi.mock("@actions/core");
+vi.mock("@actions/github");
 
 describe("isPullRequest", () => {
   it("should return true if the context is a pull request", () => {
@@ -53,7 +54,7 @@ describe("getPath", () => {
 
 describe("readActionInputs", () => {
   it("should read and return action inputs", () => {
-    (core.getInput as jest.Mock).mockImplementation((name: string) => {
+    (core.getInput as Mock).mockImplementation((name: string) => {
       const inputs: { [key: string]: string } = {
         version: "latest",
         skipInstall: "false",
@@ -68,7 +69,7 @@ describe("readActionInputs", () => {
       return inputs[name];
     });
 
-    (core.getBooleanInput as jest.Mock).mockImplementation((name: string) => {
+    (core.getBooleanInput as Mock).mockImplementation((name: string) => {
       const inputs: { [key: string]: boolean } = {
         commentsEnabled: true,
         skipBots: false,

@@ -1,5 +1,8 @@
-import { getCommentTemplate, watermark } from "../src/templates/commentTemplate";
-import { VMDAnalysis } from "../src/types";
+import { getCommentTemplate, watermark } from "../src/templates/commentTemplate.js";
+import { VMDAnalysis } from "../src/types.js";
+import { describe, expect, it } from "vitest";
+
+process.env.GITHUB_REPOSITORY = "brenoepics/vmd-action";
 
 describe("getCommentTemplate", () => {
   const analysisOutput: VMDAnalysis = {
