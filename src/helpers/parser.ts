@@ -31,28 +31,18 @@ export function parseAnalysisOutput(
   }
 }
 
-const filterIssues: (
-  baseIssues: ReportOutput[]
-) => (issue: ReportOutput) => boolean =
-  (baseIssues?: ReportOutput[]) => (issue: ReportOutput) =>
-    !baseIssues?.some(
-      mainIssue =>
-        mainIssue.id === issue.id && mainIssue.message === issue.message
-    );
-
 function filterResults(
-  mainBranchAnalysis: VMDAnalysis,
+  oldAnalysis: VMDAnalysis,
   file: string,
   newIssues: VMDAnalysis,
   issues: ReportOutput[]
 ) {
-  const mainBranchIssues: ReportOutput[] =
-    mainBranchAnalysis.reportOutput[file];
-  const newFileIssues: ReportOutput[] = issues.filter(
-    filterIssues(mainBranchIssues)
-  );
-  if (newFileIssues.length > 0) {
-    newIssues.reportOutput[file] = newFileIssues;
+  const oldIssues: ReportOutput[] = oldAnalysis.reportOutput[file];
+  const onlyNewIssues: ReportOutput[] = issues.filter(issue => {
+    return !oldIssues.some(oldIssue => oldIssue.id === issue.id);
+  });
+  if (onlyNewIssues.length > 0) {
+    newIssues.reportOutput[file] = onlyNewIssues;
   }
 }
 
@@ -63,8 +53,13 @@ function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
   codeHealth.warnings -= baseHealth.warnings;
   codeHealth.linesCount -= baseHealth.linesCount;
   codeHealth.filesCount -= baseHealth.filesCount;
-  const points: number = codeHealth.errors * ERROR_WEIGHT + codeHealth.warnings;
-  codeHealth.points = Math.ceil((1 - points / codeHealth.linesCount) * 100);
+  if (codeHealth.linesCount > 0) {
+    const points: number =
+      codeHealth.errors * ERROR_WEIGHT + codeHealth.warnings;
+    codeHealth.points = Math.ceil((1 - points / codeHealth.linesCount) * 100);
+  } else {
+    codeHealth.points = 100;
+  }
 
   return codeHealth;
 }

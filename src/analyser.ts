@@ -17,6 +17,12 @@ import {
 import { runGroup } from "./helpers/group.js";
 import { REPORT_PATH } from "./helpers/constants.js";
 import { restoreCache, saveCache } from "./github/cache.js";
+import {
+  baseBranch,
+  isBaseBranch,
+  isFork,
+  sourceBranch
+} from "./github/context.js";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -64,7 +70,6 @@ const runVMD: (pkgManager: string, input: ActionInputs) => Promise<string> = (
   ]);
 
 async function runInstallGroup(pkgManager: string, input: ActionInputs) {
-  core.info(`Detected package manager: ${pkgManager}`);
   await installVMD(input.skipInstall, pkgManager, input.version);
 }
 
@@ -89,44 +94,20 @@ async function handleResult(
   analysisOutput: VMDAnalysis,
   artifact: number
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const sourceBranch: string =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-    github.context.payload.pull_request?.head.ref.replace("refs/heads/", "");
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const targetBranch: string =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-    github.context.payload.pull_request?.base.ref.replace("refs/heads/", "");
-  const isBaseBranch: boolean =
-    github.context.ref === `refs/heads/${targetBranch}`;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const isFork: boolean =
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    github.context.payload.pull_request?.head.repo.fork ?? true;
+  if (!isPullRequest()) {
+    await commentFullReport(analysisOutput, artifact, input);
+  } else {
+    const baseAnalysis: VMDAnalysis | undefined = await restoreCache(
+      isFork ? baseBranch : sourceBranch
+    );
 
-  if (isPullRequest()) {
-    let mainBranchAnalysis: VMDAnalysis | undefined;
-
-    if (isFork) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const baseBranch: string =
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call
-        github.context.payload.pull_request?.base.ref.replace(
-          "refs/heads/",
-          ""
-        );
-      mainBranchAnalysis = await restoreCache(baseBranch);
-    } else {
-      mainBranchAnalysis = await restoreCache(sourceBranch);
-    }
-
-    if (!mainBranchAnalysis) {
+    if (!baseAnalysis) {
       await commentFullReport(analysisOutput, artifact, input);
       return;
     }
 
     const newIssues: VMDAnalysis = compareAnalysisResults(
-      mainBranchAnalysis,
+      baseAnalysis,
       analysisOutput
     );
     const newIssuesCommentBody: string = getCommentTemplate(
@@ -137,8 +118,6 @@ async function handleResult(
     if (input.commentsEnabled) {
       await commentOnPullRequest(newIssuesCommentBody);
     }
-  } else {
-    await commentFullReport(analysisOutput, artifact, input);
   }
 
   if (isBaseBranch && !isFork) {
