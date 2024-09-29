@@ -1,6 +1,6 @@
 {
   "name": "vmd-action",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
@@ -53,6 +53,7 @@
   },
   "dependencies": {
     "@actions/artifact": "2.1.9",
+    "@actions/cache": "3.2.4",
     "@actions/core": "^1.10.1",
     "@actions/github": "^6.0.0",
     "execa": "9.4.0"

@@ -5,7 +5,7 @@
 export interface VMDAnalysis {
   output: CodeHealthOutputElement[];
   codeHealthOutput: CodeHealthOutputElement[];
-  reportOutput: { [key: string]: ReportOutput[] };
+  reportOutput: { [key: string]: ReportOutput[] | undefined };
   codeHealth?: CodeHealth;
 }
 

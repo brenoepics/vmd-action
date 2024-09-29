@@ -28,17 +28,26 @@ export const coverageInfo: string = `
 📁 Total Files: {{filesCount}}
 `;
 
+export const newCoverageInfo: string = `
+🚨 New Errors: {{errors}}
+⚠️ New Warnings: {{warnings}}
+📝 New Lines: {{linesCount}}
+📁 New Files: {{filesCount}}
+`;
+
 export const artifactText: string = `
 🔍 [Download Full Analysis Details](../actions/runs/{{runId}}/artifacts/{{artifactId}})
 `;
 
 export function getCommentTemplate(
   result: VMDAnalysis,
-  artifactId: number | undefined
+  artifactId: number | undefined,
+  isRelative: boolean = false
 ): string {
+  const coverageTemplate: string = isRelative ? newCoverageInfo : coverageInfo;
   let message: string = replaceRepoData(commentTemplate, artifactId);
   if (result.codeHealth) {
-    message = replaceCodeHealth(message, result.codeHealth);
+    message = replaceCodeHealth(message, result.codeHealth, coverageTemplate);
   } else {
     message = message.replace(/{{coverageInfo}}/g, getCoverageInfo(result));
   }

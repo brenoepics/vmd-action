@@ -1,10 +1,10 @@
 import { CodeHealth, ReportOutput, VMDAnalysis } from "../types.js";
 import * as github from "@actions/github";
-import { artifactText, coverageInfo } from "./commentTemplate.js";
+import { artifactText } from "./commentTemplate.js";
 import { getCoverageBadge } from "./badgeTemplate.js";
 
 export function getReportAsMap(report: {
-  [key: string]: ReportOutput[];
+  [p: string]: ReportOutput[] | undefined;
 }): Map<string, ReportOutput[]> {
   const reportOutputMap: Map<string, ReportOutput[]> = new Map<
     string,
@@ -12,7 +12,9 @@ export function getReportAsMap(report: {
   >();
 
   for (const [parent, outputs] of Object.entries(report)) {
-    reportOutputMap.set(parent, outputs);
+    if (outputs) {
+      reportOutputMap.set(parent, outputs);
+    }
   }
 
   return reportOutputMap;
@@ -22,9 +24,13 @@ export function getCoverageInfo(result: VMDAnalysis): string {
   return result.codeHealthOutput.map(element => element.info).join("\n");
 }
 
-export function replaceCodeHealth(message: string, health: CodeHealth): string {
+export function replaceCodeHealth(
+  message: string,
+  health: CodeHealth,
+  template: string
+): string {
   return message
-    .replace(/{{coverageInfo}}/g, coverageInfo)
+    .replace(/{{coverageInfo}}/g, template)
     .replace(/{{errors}}/g, health.errors.toLocaleString())
     .replace(/{{warnings}}/g, health.warnings.toLocaleString())
     .replace(/{{linesCount}}/g, health.linesCount.toLocaleString())
