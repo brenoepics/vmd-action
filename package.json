@@ -8,7 +8,7 @@
     "clean": "rimraf dist pnpm-lock.yaml node_modules",
     "preinstall": "npx only-allow pnpm",
     "bundle": "pnpm run format:write && pnpm run package",
-    "ci-test": "pnpm vitest",
+    "ci-test": "pnpm vitest --run",
     "format:write": "prettier --cache --write .",
     "format:check": "prettier --check .",
     "lint": "eslint --cache --cache-strategy content --report-unused-disable-directives .",
