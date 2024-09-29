@@ -19,7 +19,8 @@ module.exports = {
     "coverage/",
     "lib/",
     "pnpm-lock.yaml",
-    ".pnpm-store/"
+    ".pnpm-store/",
+    "vitest.config.js"
   ],
   env: {
     node: true,

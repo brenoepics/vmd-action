@@ -10,6 +10,12 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["./src", "./vitest.config.ts", "./src/templates/reportTemplate.ts", "./src/templates/utils.ts", "./src/types.ts"],
+  "include": [
+    "./src",
+    "./vitest.config.ts",
+    "./src/templates/reportTemplate.ts",
+    "./src/templates/utils.ts",
+    "./src/types.ts"
+  ],
   "exclude": ["./dist", "./node_modules", "./__tests__", "./coverage"]
 }

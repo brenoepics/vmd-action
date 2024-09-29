@@ -1,4 +1,8 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["./src/templates/reportTemplate.ts", "./src/templates/utils.ts", "./src/types.ts"]
+  "include": [
+    "./src/templates/reportTemplate.ts",
+    "./src/templates/utils.ts",
+    "./src/types.ts"
+  ]
 }
