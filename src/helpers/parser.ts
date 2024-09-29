@@ -35,13 +35,13 @@ function filterResults(
   oldAnalysis: VMDAnalysis,
   file: string,
   newIssues: VMDAnalysis,
-  issues: ReportOutput[]
+  issues: ReportOutput[] | undefined
 ) {
-  const oldIssues: ReportOutput[] = oldAnalysis.reportOutput[file];
-  const onlyNewIssues: ReportOutput[] = issues.filter(issue => {
+  const oldIssues: ReportOutput[] = oldAnalysis.reportOutput[file] || [];
+  const onlyNewIssues: ReportOutput[] | undefined = issues?.filter(issue => {
     return !oldIssues.some(oldIssue => oldIssue.id === issue.id);
   });
-  if (onlyNewIssues.length > 0) {
+  if (onlyNewIssues && onlyNewIssues.length > 0) {
     newIssues.reportOutput[file] = onlyNewIssues;
   }
 }
