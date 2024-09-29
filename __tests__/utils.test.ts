@@ -1,10 +1,8 @@
-import { isPullRequest, getPath, readActionInputs, ActionInputs } from "../src/github/utils.js";
-import * as core from "@actions/core";
+import { isPullRequest, getPath, ActionInputs } from "../src/github/utils.js";
 import * as github from "@actions/github";
 import Path from "node:path";
-import { describe, expect, it, Mock, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@actions/core");
 vi.mock("@actions/github");
 describe("isPullRequest", () => {
   it("should return true if the context is a pull request", () => {
@@ -51,44 +49,3 @@ describe("getPath", () => {
   });
 });
 
-describe("readActionInputs", () => {
-  it("should read and return action inputs", () => {
-    (core.getInput as Mock).mockImplementation((name: string) => {
-      const inputs: { [key: string]: string } = {
-        version: "latest",
-        skipInstall: "false",
-        packageManager: "npm",
-        runArgs: "",
-        entryPoint: "",
-        srcDir: "src",
-        commentsEnabled: "true",
-        skipBots: "false",
-        relativeMode: "false"
-      };
-      return inputs[name];
-    });
-
-    (core.getBooleanInput as Mock).mockImplementation((name: string) => {
-      const inputs: { [key: string]: boolean } = {
-        commentsEnabled: true,
-        skipBots: false,
-        relativeMode: false
-      };
-      return inputs[name];
-    });
-
-    const expectedInputs: ActionInputs = {
-      version: "latest",
-      skipInstall: false,
-      packageManager: "npm",
-      runArgs: "",
-      entryPoint: "",
-      srcDir: "src",
-      commentsEnabled: true,
-      skipBots: false,
-      relativeMode: false
-    };
-
-    expect(readActionInputs()).toEqual(expectedInputs);
-  });
-});

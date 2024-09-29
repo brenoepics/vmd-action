@@ -4,7 +4,6 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it, Mock, vi, beforeEach } from "vitest";
 
-vi.mock("@actions/core");
 vi.mock("execa");
 vi.mock("node:fs");
 vi.mock("node:path");
