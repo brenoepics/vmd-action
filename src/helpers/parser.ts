@@ -84,6 +84,7 @@ export function compareAnalysisResults(
 
   for (const [file, issues] of prBranchFiles) {
     if (!issues) {
+      newIssues.reportOutput[file] = undefined;
       continue;
     }
 
