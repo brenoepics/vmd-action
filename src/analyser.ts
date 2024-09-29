@@ -17,12 +17,7 @@ import {
 import { runGroup } from "./helpers/group.js";
 import { REPORT_PATH } from "./helpers/constants.js";
 import { restoreCache, saveCache } from "./github/cache.js";
-import {
-  baseBranch,
-  isBaseBranch,
-  isFork,
-  sourceBranch
-} from "./github/context.js";
+import { baseBranch, isBaseBranch, sourceBranch } from "./github/context.js";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -98,7 +93,7 @@ async function handleResult(
     await commentFullReport(analysisOutput, artifact, input);
   } else {
     const baseAnalysis: VMDAnalysis | undefined = await restoreCache(
-      isFork ? baseBranch : sourceBranch
+      isPullRequest() ? baseBranch : sourceBranch
     );
 
     if (!baseAnalysis) {
@@ -120,7 +115,7 @@ async function handleResult(
     }
   }
 
-  if (isBaseBranch && !isFork) {
+  if (isBaseBranch && !isPullRequest()) {
     await saveCache(REPORT_PATH, sourceBranch);
   }
 }
