@@ -31,21 +31,6 @@ export function parseAnalysisOutput(
   }
 }
 
-function filterResults(
-  oldAnalysis: VMDAnalysis,
-  file: string,
-  newIssues: VMDAnalysis,
-  issues: ReportOutput[] | undefined
-) {
-  const oldIssues: ReportOutput[] = oldAnalysis.reportOutput[file] || [];
-  const onlyNewIssues: ReportOutput[] | undefined = issues?.filter(issue => {
-    return oldIssues.some(oldIssue => oldIssue.id === issue.id);
-  });
-  if (onlyNewIssues && onlyNewIssues.length > 0) {
-    newIssues.reportOutput[file] = onlyNewIssues;
-  }
-}
-
 function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
   const codeHealth: CodeHealth = prHealth;
 
@@ -66,12 +51,12 @@ function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
 
 /**
  * Compare the analysis results of the main branch and the pull request branch.
- * @param mainBranchAnalysis - The analysis results of the main branch.
+ * @param oldAnalysis - The analysis results of the main branch.
  * @param prBranchAnalysis - The analysis results of the pull request branch.
  * @returns The new issues introduced by the pull request branch.
  */
 export function compareAnalysisResults(
-  mainBranchAnalysis: VMDAnalysis,
+  oldAnalysis: VMDAnalysis,
   prBranchAnalysis: VMDAnalysis
 ): VMDAnalysis {
   const newIssues: VMDAnalysis = {
@@ -80,20 +65,41 @@ export function compareAnalysisResults(
     reportOutput: {},
     codeHealth: EMPTY_REPORT
   };
-  for (const [file, issues] of Object.entries(prBranchAnalysis.reportOutput)) {
-    filterResults(mainBranchAnalysis, file, newIssues, issues);
-  }
 
   if (
     prBranchAnalysis.codeHealth === undefined ||
-    mainBranchAnalysis.codeHealth === undefined
+    oldAnalysis.codeHealth === undefined
   ) {
     return newIssues;
   }
 
   newIssues.codeHealth = getRelativeHealth(
     prBranchAnalysis.codeHealth,
-    mainBranchAnalysis.codeHealth
+    oldAnalysis.codeHealth
   );
+
+  const prBranchFiles: [string, ReportOutput[] | undefined][] = Object.entries(
+    prBranchAnalysis.reportOutput
+  );
+
+  for (const [file, issues] of prBranchFiles) {
+    if (!issues) {
+      continue;
+    }
+
+    if (oldAnalysis.reportOutput[file]) {
+      const oldIssues: ReportOutput[] | undefined =
+        oldAnalysis.reportOutput[file];
+      const onlyNewIssues: ReportOutput[] = issues.filter(
+        issue => !oldIssues.some(oldIssue => oldIssue.id === issue.id)
+      );
+      if (onlyNewIssues.length > 0) {
+        newIssues.reportOutput[file] = onlyNewIssues;
+      }
+    } else {
+      newIssues.reportOutput[file] = issues;
+    }
+  }
+
   return newIssues;
 }
