@@ -4,7 +4,7 @@ import {
   runPackage
 } from "./helpers/package.js";
 import * as core from "@actions/core";
-import { ActionInputs, getPath, isPullRequest } from "./github/utils.js";
+import { ActionInputs, getPath } from "./github/utils.js";
 import { VMDAnalysis } from "./types.js";
 import { uploadOutputArtifact } from "./github/artifact.js";
 import { commentOnPullRequest } from "./github/comments.js";
@@ -17,7 +17,11 @@ import {
 import { runGroup } from "./helpers/group.js";
 import { REPORT_PATH } from "./helpers/constants.js";
 import { restoreCache, saveCache } from "./github/cache.js";
-import { baseBranch, sourceBranch } from "./github/context.js";
+import {
+  CURRENT_BRANCH,
+  IS_PULL_REQUEST,
+  TARGET_BRANCH
+} from "./github/context.js";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -80,7 +84,7 @@ async function commentFullReport(
 ) {
   const commentBody: string = getCommentTemplate(analysisOutput, artifact);
   await core.summary.addRaw(commentBody).write();
-  if (isPullRequest() && input.commentsEnabled)
+  if (IS_PULL_REQUEST && input.commentsEnabled)
     await commentOnPullRequest(commentBody);
 }
 
@@ -89,33 +93,39 @@ async function handleResult(
   analysisOutput: VMDAnalysis,
   artifact: number
 ) {
-  if (!isPullRequest()) {
+  if (!IS_PULL_REQUEST) {
+    await saveCache(REPORT_PATH, CURRENT_BRANCH);
     await commentFullReport(analysisOutput, artifact, input);
-  } else {
-    const baseAnalysis: VMDAnalysis | undefined = await restoreCache(
-      isPullRequest() ? baseBranch : sourceBranch
-    );
-
-    if (!baseAnalysis) {
-      await commentFullReport(analysisOutput, artifact, input);
-    } else {
-      const newIssues: VMDAnalysis = compareAnalysisResults(
-        baseAnalysis,
-        analysisOutput
-      );
-      const newIssuesCommentBody: string = getCommentTemplate(
-        newIssues,
-        artifact
-      );
-      await core.summary.addRaw(newIssuesCommentBody).write();
-      if (input.commentsEnabled) {
-        await commentOnPullRequest(newIssuesCommentBody);
-      }
-    }
+    return;
   }
+  if (!TARGET_BRANCH) {
+    core.warning("Could not find the target branch!");
+    await commentFullReport(analysisOutput, artifact, input);
+    return;
+  }
+  core.info(
+    `Comparing analysis results with base branch (${TARGET_BRANCH})...`
+  );
 
-  if (!isPullRequest()) {
-    await saveCache(REPORT_PATH, sourceBranch);
+  const oldAnalysis: VMDAnalysis | undefined =
+    await restoreCache(TARGET_BRANCH);
+
+  if (!oldAnalysis) {
+    await commentFullReport(analysisOutput, artifact, input);
+    return;
+  }
+  const newIssues: VMDAnalysis = compareAnalysisResults(
+    oldAnalysis,
+    analysisOutput
+  );
+  const newIssuesCommentBody: string = getCommentTemplate(
+    newIssues,
+    artifact,
+    true
+  );
+  await core.summary.addRaw(newIssuesCommentBody).write();
+  if (input.commentsEnabled) {
+    await commentOnPullRequest(newIssuesCommentBody);
   }
 }
 
