@@ -76,20 +76,26 @@ export function getHealthBadge(
   return `![${label}](${badgeUrl})`;
 }
 
-export function getHealthOutput(output: VMDOutput): string {
+export function getHealthOutput(output: VMDOutput): string[] {
+  const badges: string[] = [];
   if (output.relativeAnalysis?.prCodeHealth) {
-    return getHealthBadge(
-      "PR Code Health",
-      output.relativeAnalysis.prCodeHealth.points
+    badges.push(
+      getHealthBadge(
+        "PR Code Health",
+        output.relativeAnalysis.prCodeHealth.points
+      )
     );
   }
 
   if (output.fullAnalysis.codeHealth) {
-    return getHealthBadge(
-      "Full Code Health",
-      output.fullAnalysis.codeHealth.points
+    badges.push(
+      getHealthBadge("Full Code Health", output.fullAnalysis.codeHealth.points)
     );
   }
 
-  return getHealthBadge("Code Health", null);
+  if (badges.length === 0) {
+    badges.push(getHealthBadge("Code Health", null));
+  }
+
+  return badges;
 }

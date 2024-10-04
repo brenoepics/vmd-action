@@ -51,7 +51,7 @@ export function getCommentTemplate(
       result.relativeAnalysis.prCodeHealth,
       coverageTemplate
     );
-    message = replaceBadges(message, [getHealthOutput(result)]);
+    message = replaceBadges(message, getHealthOutput(result));
     message = message.replace(
       /{{reportBlock}}/g,
       getReportTemplate(
@@ -67,7 +67,7 @@ export function getCommentTemplate(
     result.fullAnalysis.codeHealth,
     coverageTemplate
   );
-  message = replaceBadges(message, [getHealthOutput(result)]);
+  message = replaceBadges(message, getHealthOutput(result));
   message = message.replace(
     /{{reportBlock}}/g,
     getReportTemplate("Issues", result.fullAnalysis.reportOutput)
