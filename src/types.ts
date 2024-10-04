@@ -10,8 +10,8 @@ export interface VMDAnalysis {
 }
 
 export type VMDOutput = {
+  relativeAnalysis?: VMDAnalysis & { prCodeHealth?: CodeHealth };
   fullAnalysis: VMDAnalysis;
-  prHealth?: CodeHealth;
 };
 
 export interface CodeHealth {

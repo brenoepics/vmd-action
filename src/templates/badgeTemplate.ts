@@ -78,8 +78,13 @@ export function getCoverageBadge(
 
 export function getHealthBadges(output: VMDOutput): string[] {
   const badges: string[] = [];
-  if (output.prHealth) {
-    badges.push(getCoverageBadge("PR Code Health", output.prHealth.points));
+  if (output.relativeAnalysis?.prCodeHealth) {
+    badges.push(
+      getCoverageBadge(
+        "PR Code Health",
+        output.relativeAnalysis.prCodeHealth.points
+      )
+    );
   }
 
   if (output.fullAnalysis.codeHealth) {

@@ -1,4 +1,4 @@
-import { CodeHealth, ReportOutput, VMDAnalysis, VMDOutput } from "../types.js";
+import { ReportOutput, VMDAnalysis, VMDOutput } from "../types.js";
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { tagsRemover } from "./tags.js";
@@ -31,85 +31,66 @@ export function parseAnalysisOutput(
   }
 }
 
-function getRelativeHealth(
-  prHealth: CodeHealth,
-  baseHealth: CodeHealth | undefined
-) {
-  if (!baseHealth) {
-    return prHealth;
+function getRelativeHealth({
+  errors,
+  warnings,
+  linesCount
+}: {
+  errors: number;
+  warnings: number;
+  linesCount: number;
+}) {
+  const errorsWeight: number = errors * ERROR_WEIGHT + warnings;
+
+  if (linesCount > 0) {
+    return Math.ceil((1 - errorsWeight / linesCount) * 100);
   }
 
-  const codeHealth: CodeHealth = prHealth;
-
-  codeHealth.errors -= baseHealth.errors;
-  codeHealth.warnings -= baseHealth.warnings;
-  codeHealth.linesCount -= baseHealth.linesCount;
-  codeHealth.filesCount -= baseHealth.filesCount;
-  if (codeHealth.linesCount > 0) {
-    const errorsWeight: number =
-      codeHealth.errors * ERROR_WEIGHT + codeHealth.warnings;
-    codeHealth.points = Math.ceil(
-      (1 - errorsWeight / codeHealth.linesCount) * 100
-    );
-  } else {
-    codeHealth.points = 100;
-  }
-
-  return codeHealth;
+  return Math.ceil((1 - errorsWeight) * 100);
 }
 
-/**
- * Calculate the total number of errors and warnings from the report output.
- * @param reportOutput - The report output to calculate from.
- * @returns An object containing the total errors and warnings.
- */
-function calculateIssues(reportOutput: {
-  [key: string]: ReportOutput[] | undefined;
-}): { totalErrors: number; totalWarnings: number } {
-  let totalErrors: number = 0;
-  let totalWarnings: number = 0;
+type issuesOutput = {
+  issues: { totalErrors: number; totalWarnings: number };
+  report: { [key: string]: ReportOutput[] | undefined };
+};
 
-  for (const issues of Object.values(reportOutput)) {
-    if (!issues) {
-      continue;
-    }
-    for (const issue of issues) {
-      if (issue.level === "error") {
-        totalErrors++;
-      } else if (issue.level === "warning") {
-        totalWarnings++;
-      }
-    }
-  }
-
-  return { totalErrors, totalWarnings };
+function getTotalIssues(issues: ReportOutput[], level: string): number {
+  return issues.filter(issue => issue.level === level).length;
 }
 
 function calculateNewIssues(
   prBranchFiles: [string, ReportOutput[] | undefined][],
-  output: VMDOutput,
   oldAnalysis: VMDAnalysis
-) {
+): issuesOutput {
+  const output: issuesOutput = {
+    issues: { totalErrors: 0, totalWarnings: 0 },
+    report: {}
+  };
+
   for (const [file, issues] of prBranchFiles) {
     if (!issues) {
-      output.fullAnalysis.reportOutput[file] = undefined;
+      output.report[file] = undefined;
       continue;
     }
 
     if (!oldAnalysis.reportOutput[file]) {
-      output.fullAnalysis.reportOutput[file] = issues;
+      output.report[file] = issues;
       continue;
     }
 
+    output.issues.totalErrors += getTotalIssues(issues, "error");
+    output.issues.totalWarnings += getTotalIssues(issues, "warning");
     const oldIssues: ReportOutput[] | undefined =
       oldAnalysis.reportOutput[file];
     const onlyNewIssues: ReportOutput[] = issues.filter(
       issue => !oldIssues.some(oldIssue => oldIssue.id === issue.id)
     );
     if (onlyNewIssues.length > 0) {
-      output.fullAnalysis.reportOutput[file] = onlyNewIssues;
+      output.report[file] = onlyNewIssues;
     }
   }
+
+  return output;
 }
 
 /**
@@ -123,39 +104,43 @@ export function compareAnalysisResults(
   prBranchAnalysis: VMDAnalysis
 ): VMDOutput {
   const output: VMDOutput = {
-    fullAnalysis: {
+    relativeAnalysis: {
       output: [],
       codeHealthOutput: [],
       reportOutput: {},
-      codeHealth: oldAnalysis.codeHealth
+      codeHealth: prBranchAnalysis.codeHealth
     },
-    prHealth: prBranchAnalysis.codeHealth
+    fullAnalysis: prBranchAnalysis
   };
 
   if (
     prBranchAnalysis.codeHealth === undefined ||
-    oldAnalysis.codeHealth === undefined
+    oldAnalysis.codeHealth === undefined ||
+    output.relativeAnalysis === undefined
   ) {
     return output;
   }
 
-  calculateNewIssues(
+  const newIssues: issuesOutput = calculateNewIssues(
     Object.entries(prBranchAnalysis.reportOutput),
-    output,
     oldAnalysis
   );
 
-  const total: { totalErrors: number; totalWarnings: number } = calculateIssues(
-    output.fullAnalysis.reportOutput
-  );
-
-  prBranchAnalysis.codeHealth.errors = total.totalErrors;
-  prBranchAnalysis.codeHealth.warnings = total.totalWarnings;
-
-  output.prHealth = getRelativeHealth(
-    prBranchAnalysis.codeHealth,
-    output.fullAnalysis.codeHealth
-  );
+  const points: number | null = getRelativeHealth({
+    errors: newIssues.issues.totalErrors,
+    warnings: newIssues.issues.totalWarnings,
+    linesCount: prBranchAnalysis.codeHealth.linesCount
+  });
+  output.relativeAnalysis.prCodeHealth = {
+    errors: newIssues.issues.totalErrors,
+    warnings: newIssues.issues.totalWarnings,
+    points: points,
+    linesCount:
+      prBranchAnalysis.codeHealth.linesCount -
+      oldAnalysis.codeHealth.linesCount,
+    filesCount:
+      prBranchAnalysis.codeHealth.filesCount - oldAnalysis.codeHealth.filesCount
+  };
 
   return output;
 }

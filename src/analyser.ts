@@ -22,6 +22,7 @@ import {
   IS_PULL_REQUEST,
   TARGET_BRANCH
 } from "./github/context.js";
+import fs from "node:fs";
 
 export async function runVueMessDetector(input: ActionInputs): Promise<void> {
   if (input.skipBots && github.context.payload.sender?.type === "Bot") {
@@ -79,32 +80,37 @@ async function runAnalysisGroup(pkgManager: string, input: ActionInputs) {
 
 export async function commentFullReport(
   analysisOutput: VMDAnalysis,
-  artifact: number,
   input: ActionInputs
 ): Promise<void> {
   const output: VMDOutput = {
+    relativeAnalysis: analysisOutput,
     fullAnalysis: analysisOutput
   };
-
+  const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
   const commentBody: string = getCommentTemplate(output, artifact);
   await core.summary.addRaw(commentBody).write();
   if (IS_PULL_REQUEST && input.commentsEnabled)
     await commentOnPullRequest(commentBody);
 }
 
+async function generatedRelativeArtifact(newIssues: VMDOutput) {
+  const newIssuesContent: string = JSON.stringify(newIssues, null, 2);
+  fs.writeFileSync(REPORT_PATH, newIssuesContent, "utf-8");
+  return await uploadOutputArtifact(REPORT_PATH);
+}
+
 export async function handleResult(
   input: ActionInputs,
-  analysisOutput: VMDAnalysis,
-  artifact: number
+  analysisOutput: VMDAnalysis
 ): Promise<void> {
   if (!IS_PULL_REQUEST) {
     await saveCache(REPORT_PATH, CURRENT_BRANCH);
-    await commentFullReport(analysisOutput, artifact, input);
+    await commentFullReport(analysisOutput, input);
     return;
   }
   if (!TARGET_BRANCH) {
     core.warning("Could not find the target branch!");
-    await commentFullReport(analysisOutput, artifact, input);
+    await commentFullReport(analysisOutput, input);
     return;
   }
   core.info(
@@ -115,13 +121,15 @@ export async function handleResult(
     await restoreCache(TARGET_BRANCH);
 
   if (!oldAnalysis) {
-    await commentFullReport(analysisOutput, artifact, input);
+    await commentFullReport(analysisOutput, input);
     return;
   }
   const newIssues: VMDOutput = compareAnalysisResults(
     oldAnalysis,
     analysisOutput
   );
+  const artifact: number | undefined =
+    await generatedRelativeArtifact(newIssues);
   const newIssuesCommentBody: string = getCommentTemplate(newIssues, artifact);
   await core.summary.addRaw(newIssuesCommentBody).write();
   if (input.commentsEnabled) {
@@ -132,8 +140,7 @@ export async function handleResult(
 async function runUploadGroup(input: ActionInputs) {
   const analysisOutput: VMDAnalysis | undefined =
     parseAnalysisOutput(REPORT_PATH);
-  const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
-  if (analysisOutput !== undefined && artifact !== undefined) {
-    await handleResult(input, analysisOutput, artifact);
+  if (analysisOutput !== undefined) {
+    await handleResult(input, analysisOutput);
   }
 }

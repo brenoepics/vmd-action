@@ -39,21 +39,30 @@ export function getCommentTemplate(
   result: VMDOutput,
   artifactId: number | undefined
 ): string {
-  const coverageTemplate: string = result.prHealth
+  const coverageTemplate: string = result.relativeAnalysis
     ? newCoverageInfo
     : coverageInfo;
   let message: string = replaceRepoData(commentTemplate, artifactId);
-  if (result.prHealth) {
-    message = replaceCodeHealth(message, result.prHealth, coverageTemplate);
-    message = replaceBadges(message, getHealthBadges(result));
-  } else {
+  if (result.relativeAnalysis) {
     message = replaceCodeHealth(
       message,
-      result.fullAnalysis.codeHealth,
+      result.relativeAnalysis.prCodeHealth,
       coverageTemplate
     );
+    message = replaceBadges(message, getHealthBadges(result));
+    message = message.replace(
+      /{{reportBlock}}/g,
+      getReportTemplate(result.relativeAnalysis)
+    );
+    return message;
   }
 
+  message = replaceCodeHealth(
+    message,
+    result.fullAnalysis.codeHealth,
+    coverageTemplate
+  );
+  message = replaceBadges(message, getHealthBadges(result));
   message = message.replace(
     /{{reportBlock}}/g,
     getReportTemplate(result.fullAnalysis)
