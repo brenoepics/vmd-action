@@ -1,4 +1,4 @@
-import { ReportOutput, VMDAnalysis } from "../types.js";
+import { ReportOutput, VMDAnalysis, VMDReportList } from "../types.js";
 import { getReportAsMap } from "./utils.js";
 import path from "node:path";
 
@@ -20,9 +20,7 @@ export function getReportTemplate(analysis: VMDAnalysis): string {
   return reportBlock.replace(/{{outputList}}/g, codeBlock);
 }
 
-export function renderReport(analysis: {
-  [p: string]: ReportOutput[] | undefined;
-}): string {
+export function renderReport(analysis: VMDReportList): string {
   let outputList: string = "";
   const res: Map<string, ReportOutput[]> = getReportAsMap(analysis);
 

@@ -2,19 +2,21 @@
  * This file contains the typescript interfaces for the VMDAnalysis object
  * codeHealth is only present on vue-mess-detector >= 0.54.1
  */
+
+export type VMDReportList = { [key: string]: ReportOutput[] | undefined };
 export interface VMDAnalysis {
   output: CodeHealthOutputElement[];
   codeHealthOutput: CodeHealthOutputElement[];
-  reportOutput: { [key: string]: ReportOutput[] | undefined };
+  reportOutput: VMDReportList;
   codeHealth?: CodeHealth;
 }
 
-export interface IssuesOutput {
-  newIssues: ReportOutput[];
-  fixedIssues: ReportOutput[];
-}
+export type IssuesOutput = {
+  newIssues: VMDReportList;
+  fixedIssues: VMDReportList;
+};
 
-export type relativeAnalysis = VMDAnalysis & { prCodeHealth?: PRCodeHealth } & {
+export type relativeAnalysis = { prCodeHealth?: PRCodeHealth } & {
   issues?: IssuesOutput;
 };
 

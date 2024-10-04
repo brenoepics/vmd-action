@@ -83,7 +83,6 @@ export async function commentFullReport(
   input: ActionInputs
 ): Promise<void> {
   const output: VMDOutput = {
-    relativeAnalysis: analysisOutput,
     fullAnalysis: analysisOutput
   };
   const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
@@ -117,8 +116,10 @@ export async function handleResult(
     `Comparing analysis results with base branch (${TARGET_BRANCH})...`
   );
 
-  const oldAnalysis: VMDAnalysis | undefined =
-    await restoreCache(TARGET_BRANCH);
+  const oldAnalysis: VMDAnalysis | undefined = await restoreCache(
+    TARGET_BRANCH,
+    REPORT_PATH
+  );
 
   if (!oldAnalysis) {
     await commentFullReport(analysisOutput, input);

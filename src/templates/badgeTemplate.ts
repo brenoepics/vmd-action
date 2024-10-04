@@ -47,7 +47,7 @@ function getHealthColor(percentage: number) {
   return "#2ecc71";
 }
 
-export function getCoverageBadge(
+export function getHealthBadge(
   label: string,
   percentage: number | undefined | string | null
 ): string {
@@ -76,25 +76,20 @@ export function getCoverageBadge(
   return `![${label}](${badgeUrl})`;
 }
 
-export function getHealthBadges(output: VMDOutput): string[] {
-  const badges: string[] = [];
+export function getHealthOutput(output: VMDOutput): string {
   if (output.relativeAnalysis?.prCodeHealth) {
-    badges.push(
-      getCoverageBadge(
-        "PR Code Health",
-        output.relativeAnalysis.prCodeHealth.points
-      )
+    return getHealthBadge(
+      "PR Code Health",
+      output.relativeAnalysis.prCodeHealth.points
     );
   }
 
   if (output.fullAnalysis.codeHealth) {
-    badges.push(
-      getCoverageBadge(
-        "Full Code Health",
-        output.fullAnalysis.codeHealth.points
-      )
+    return getHealthBadge(
+      "Full Code Health",
+      output.fullAnalysis.codeHealth.points
     );
   }
 
-  return badges;
+  return getHealthBadge("Code Health", null);
 }

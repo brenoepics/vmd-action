@@ -1,12 +1,13 @@
 import { VMDOutput } from "../types.js";
 import { replaceBadges, replaceCodeHealth, replaceRepoData } from "./utils.js";
 import { getReportTemplate } from "./reportTemplate.js";
-import { getHealthBadges } from "./badgeTemplate.js";
+import { getHealthOutput } from "./badgeTemplate.js";
+import { ASSETS_URL, ISSUES_URL } from "../helpers/constants.js";
 
 export const watermark: string = `<!-- VMD Analysis Comment -->`;
-
+const LOGO_URL: string = `${ASSETS_URL}/src/templates/logo.png`;
 const commentTemplate: string = `${watermark}
-## 📊 Vue Mess Detector Analysis Results
+## ![logo](${LOGO_URL}) Vue Mess Detector Analysis Results
 
 #### {{coverageBadge}}
 {{coverageInfo}}
@@ -14,7 +15,7 @@ const commentTemplate: string = `${watermark}
 {{reportBlock}}
 {{artifactText}}
 
-###### For any issues or feedback, feel free to [report them here](https://github.com/brenoepics/vmd-action/issues/).
+###### For any issues or feedback, feel free to [report them here](${ISSUES_URL}).
 `;
 
 export const coverageInfo: string = `
@@ -51,10 +52,10 @@ export function getCommentTemplate(
       result.relativeAnalysis.prCodeHealth,
       coverageTemplate
     );
-    message = replaceBadges(message, getHealthBadges(result));
+    message = replaceBadges(message, [getHealthOutput(result)]);
     message = message.replace(
       /{{reportBlock}}/g,
-      getReportTemplate(result.relativeAnalysis)
+      getReportTemplate(result.fullAnalysis)
     );
     return message;
   }
@@ -64,7 +65,7 @@ export function getCommentTemplate(
     result.fullAnalysis.codeHealth,
     coverageTemplate
   );
-  message = replaceBadges(message, getHealthBadges(result));
+  message = replaceBadges(message, [getHealthOutput(result)]);
   message = message.replace(
     /{{reportBlock}}/g,
     getReportTemplate(result.fullAnalysis)

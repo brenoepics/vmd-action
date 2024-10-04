@@ -1,4 +1,9 @@
-import { ReportOutput, VMDAnalysis, VMDOutput } from "../types.js";
+import {
+  ReportOutput,
+  VMDAnalysis,
+  VMDOutput,
+  VMDReportList
+} from "../types.js";
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { tagsRemover } from "./tags.js";
@@ -47,7 +52,7 @@ function getRelativeHealth(health: RelativeHealth): number | null {
 }
 
 type issuesOutput = {
-  issues: { newIssues: ReportOutput[]; fixedIssues: ReportOutput[] };
+  issues: { newIssues: VMDReportList; fixedIssues: VMDReportList };
   report: { [key: string]: ReportOutput[] | undefined };
 };
 
@@ -56,7 +61,7 @@ function calculateNewIssues(
   oldAnalysis: VMDAnalysis
 ): issuesOutput {
   const output: issuesOutput = {
-    issues: { newIssues: [], fixedIssues: [] },
+    issues: { newIssues: {}, fixedIssues: {} },
     report: {}
   };
 
@@ -67,13 +72,13 @@ function calculateNewIssues(
     if (!issues) {
       output.report[file] = undefined;
       if (oldIssues) {
-        output.issues.fixedIssues.push(...oldIssues);
+        output.issues.fixedIssues[file] = oldIssues;
       }
       continue;
     }
     if (!oldIssues) {
       output.report[file] = issues;
-      output.issues.newIssues.push(...issues);
+      output.issues.newIssues[file] = issues;
       continue;
     }
 
@@ -86,19 +91,27 @@ function calculateNewIssues(
 
     if (onlyNewIssues.length > 0) {
       output.report[file] = onlyNewIssues;
-      output.issues.newIssues.push(...onlyNewIssues);
+      output.issues.newIssues[file] = onlyNewIssues;
     }
 
     if (onlyFixedIssues.length > 0) {
-      output.issues.fixedIssues.push(...onlyFixedIssues);
+      output.issues.fixedIssues[file] = onlyFixedIssues;
     }
   }
 
   return output;
 }
 
-function getFilteredIssues(report: ReportOutput[], level: string) {
-  return report.filter(issue => issue.level === level);
+function getFilteredIssues(
+  report: (ReportOutput[] | undefined)[],
+  level: string
+): number {
+  return report
+    .filter(
+      (issues): issues is ReportOutput[] =>
+        issues?.some(issue => issue.level === level) ?? false
+    )
+    .reduce((acc, issues) => acc + issues.length, 0);
 }
 
 type RelativeResults = {
@@ -132,21 +145,21 @@ function getRelativeResults(
     oldAnalysis
   );
   const newErrors: number = getFilteredIssues(
-    newIssues.issues.newIssues,
+    Object.values(newIssues.issues.newIssues),
     "error"
-  ).length;
+  );
   const newWarnings: number = getFilteredIssues(
-    newIssues.issues.newIssues,
+    Object.values(newIssues.issues.newIssues),
     "warning"
-  ).length;
+  );
   const fixedErrors: number = getFilteredIssues(
-    newIssues.issues.fixedIssues,
+    Object.values(newIssues.issues.fixedIssues),
     "error"
-  ).length;
+  );
   const fixedWarnings: number = getFilteredIssues(
-    newIssues.issues.fixedIssues,
+    Object.values(newIssues.issues.fixedIssues),
     "warning"
-  ).length;
+  );
 
   const newPoints: number | null = getRelativeHealth({
     errors: newErrors + oldAnalysis.codeHealth.errors - fixedErrors,
@@ -175,11 +188,7 @@ export function compareAnalysisResults(
 ): VMDOutput {
   const output: VMDOutput = {
     relativeAnalysis: {
-      output: [],
-      codeHealthOutput: [],
-      reportOutput: {},
-      codeHealth: prBranchAnalysis.codeHealth,
-      issues: { newIssues: [], fixedIssues: [] }
+      issues: { newIssues: {}, fixedIssues: {} }
     },
     fullAnalysis: prBranchAnalysis
   };
@@ -210,7 +219,6 @@ export function compareAnalysisResults(
   } = results;
 
   output.relativeAnalysis = {
-    codeHealth: prBranchAnalysis.codeHealth,
     prCodeHealth: {
       newErrors: newErrors,
       newWarnings: newWarnings,
@@ -224,10 +232,7 @@ export function compareAnalysisResults(
         prBranchAnalysis.codeHealth.filesCount -
         oldAnalysis.codeHealth.filesCount
     },
-    issues: newIssues.issues,
-    codeHealthOutput: [],
-    output: [],
-    reportOutput: newIssues.report
+    issues: newIssues.issues
   };
 
   return output;
