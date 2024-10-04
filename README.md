@@ -14,9 +14,8 @@ Easily integrate [Vue Mess Detector](https://github.com/rrd108/vue-mess-detector
 request alerts and display badges effortlessly.
 
 <details>
-<summary>Preview</summary>
+<summary>Pull Request Demo</summary>
 
-![image](https://github.com/user-attachments/assets/aea8dbb9-49c8-4206-abba-9e4d475040ad)
 ![img.png](preview.png)
 
 </details>
@@ -61,9 +60,9 @@ jobs:
           node-version: '20'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.5
+        uses: brenoepics/vmd-action@v0.0.6
         # with:
-          # check inputs for full args list
+        # check inputs for full args list
 
 ```
 
@@ -79,7 +78,7 @@ artifacts.
 
 | Input             | Description                                          | Required | Default                                                 |
 |-------------------|------------------------------------------------------|----------|---------------------------------------------------------|
-| github-token      | GitHub token for commenting on pull requests         | `false`  |                                                         |
+| github-token      | GitHub token for commenting on pull requests         | `false`  | `github.token`                                          |
 | version           | Version of Vue Mess Detector                         | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
 | skipInstall       | Skip the installation of Vue Mess Detector           | `true`   | `false`                                                 |
 | skipBots          | Skip running analysis on pull requests from bots     | `true`   | `true`                                                  |
