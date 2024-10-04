@@ -145,8 +145,7 @@ function getRelativeResults(
   const newPoints: number | null = getRelativeHealth({
     errors: newErrors,
     warnings: newWarnings,
-    linesCount:
-      prBranchAnalysis.codeHealth.linesCount
+    linesCount: prBranchAnalysis.codeHealth.linesCount
   });
   return {
     newIssues,
