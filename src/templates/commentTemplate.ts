@@ -54,7 +54,10 @@ export function getCommentTemplate(
     message = replaceBadges(message, [getHealthOutput(result)]);
     message = message.replace(
       /{{reportBlock}}/g,
-      getReportTemplate(result.relativeAnalysis.issues?.newIssues ?? {})
+      getReportTemplate(
+        "New Issues",
+        result.relativeAnalysis.issues?.newIssues ?? {}
+      )
     );
     return message;
   }
@@ -67,7 +70,7 @@ export function getCommentTemplate(
   message = replaceBadges(message, [getHealthOutput(result)]);
   message = message.replace(
     /{{reportBlock}}/g,
-    getReportTemplate(result.fullAnalysis.reportOutput)
+    getReportTemplate("Issues", result.fullAnalysis.reportOutput)
   );
   return message;
 }

@@ -4,20 +4,25 @@ import path from "node:path";
 
 const reportBlock: string = `
 <details>
-  <summary>VMD Report</summary>
+  <summary>{{summary}}</summary>
   
   {{outputList}}
 
 </details>
 `;
 
-export function getReportTemplate(reportOutput: VMDReportList): string {
+export function getReportTemplate(
+  summary: string,
+  reportOutput: VMDReportList
+): string {
   const report: string = renderReport(reportOutput);
   if (report === "") {
     return "";
   }
   const codeBlock: string = `\`\`\`\n${renderReport(reportOutput)}\n\`\`\``;
-  return reportBlock.replace(/{{outputList}}/g, codeBlock);
+  return reportBlock
+    .replace(/{{outputList}}/g, codeBlock)
+    .replace(/{{summary}}/g, summary);
 }
 
 function renderReport(analysis: VMDReportList): string {
