@@ -131,9 +131,11 @@ export function compareAnalysisResults(
     warnings: newIssues.issues.totalWarnings,
     linesCount: prBranchAnalysis.codeHealth.linesCount
   });
+  output.relativeAnalysis.reportOutput = newIssues.report;
   output.relativeAnalysis.prCodeHealth = {
-    errors: newIssues.issues.totalErrors,
-    warnings: newIssues.issues.totalWarnings,
+    errors: newIssues.issues.totalErrors - prBranchAnalysis.codeHealth.errors,
+    warnings:
+      newIssues.issues.totalWarnings - prBranchAnalysis.codeHealth.warnings,
     points: points,
     linesCount:
       prBranchAnalysis.codeHealth.linesCount -
