@@ -78,14 +78,14 @@ function calculateNewIssues(
       continue;
     }
 
-    output.issues.totalErrors += getTotalIssues(issues, "error");
-    output.issues.totalWarnings += getTotalIssues(issues, "warning");
     const oldIssues: ReportOutput[] | undefined =
       oldAnalysis.reportOutput[file];
     const onlyNewIssues: ReportOutput[] = issues.filter(
       issue => !oldIssues.some(oldIssue => oldIssue.id === issue.id)
     );
     if (onlyNewIssues.length > 0) {
+      output.issues.totalErrors += getTotalIssues(onlyNewIssues, "error");
+      output.issues.totalWarnings += getTotalIssues(onlyNewIssues, "warning");
       output.report[file] = onlyNewIssues;
     }
   }
@@ -131,17 +131,22 @@ export function compareAnalysisResults(
     warnings: newIssues.issues.totalWarnings,
     linesCount: prBranchAnalysis.codeHealth.linesCount
   });
-  output.relativeAnalysis.reportOutput = newIssues.report;
-  output.relativeAnalysis.prCodeHealth = {
-    errors: newIssues.issues.totalErrors - prBranchAnalysis.codeHealth.errors,
-    warnings:
-      newIssues.issues.totalWarnings - prBranchAnalysis.codeHealth.warnings,
-    points: points,
-    linesCount:
-      prBranchAnalysis.codeHealth.linesCount -
-      oldAnalysis.codeHealth.linesCount,
-    filesCount:
-      prBranchAnalysis.codeHealth.filesCount - oldAnalysis.codeHealth.filesCount
+  output.relativeAnalysis = {
+    codeHealth: prBranchAnalysis.codeHealth,
+    codeHealthOutput: [],
+    output: [],
+    reportOutput: newIssues.report,
+    prCodeHealth: {
+      errors: newIssues.issues.totalErrors,
+      warnings: newIssues.issues.totalWarnings,
+      points: points,
+      linesCount:
+        prBranchAnalysis.codeHealth.linesCount -
+        oldAnalysis.codeHealth.linesCount,
+      filesCount:
+        prBranchAnalysis.codeHealth.filesCount -
+        oldAnalysis.codeHealth.filesCount
+    }
   };
 
   return output;
