@@ -39,14 +39,14 @@ function getRelativeHealth({
   errors: number;
   warnings: number;
   linesCount: number;
-}) {
+}): number | null {
   const errorsWeight: number = errors * ERROR_WEIGHT + warnings;
 
   if (linesCount > 0) {
     return Math.ceil((1 - errorsWeight / linesCount) * 100);
   }
 
-  return Math.ceil((1 - errorsWeight) * 100);
+  return null;
 }
 
 type issuesOutput = {
@@ -104,7 +104,7 @@ function getFilteredIssues(report: ReportOutput[], level: string) {
 
 type RelativeResults = {
   newErrors: number;
-  newPoints: number;
+  newPoints: number | null;
   newIssues: issuesOutput;
   fixedErrors: number;
   newWarnings: number;
@@ -114,7 +114,7 @@ type RelativeResults = {
 function getRelativeResults(
   prBranchAnalysis: VMDAnalysis,
   oldAnalysis: VMDAnalysis
-): undefined | RelativeResults {
+): RelativeResults | undefined {
   if (
     prBranchAnalysis.codeHealth === undefined ||
     oldAnalysis.codeHealth === undefined
@@ -146,7 +146,7 @@ function getRelativeResults(
     errors: newErrors,
     warnings: newWarnings,
     linesCount:
-      prBranchAnalysis.codeHealth.linesCount - oldAnalysis.codeHealth.linesCount
+      prBranchAnalysis.codeHealth.linesCount
   });
   return {
     newIssues,

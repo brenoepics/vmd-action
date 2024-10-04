@@ -59,7 +59,7 @@ export function replaceRepoData(
     .replace(/{{artifactText}}/g, artifactId ? artifactText : "")
     .replace(/{{artifactId}}/g, String(artifactId ?? 0))
     .replace(/{{runId}}/g, github.context.runId.toString())
-    .replace(/{{repository/g, github.context.repo.repo)
+    .replace(/{{repositoryName/g, github.context.repo.repo)
     .replace(/{{repositoryOwner/g, github.context.repo.owner);
 }
 

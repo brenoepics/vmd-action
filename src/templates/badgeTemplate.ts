@@ -57,7 +57,7 @@ export function getCoverageBadge(
     percentage = "N/A";
     color = "#8c8c8c";
     core.warning(
-      "No code health data found in the analysis output! you may need to update vue-mess-detector to >= 0.54.1"
+      "No code health data or negative percentage found in the analysis output! you may need to update vue-mess-detector to >= 0.54.1"
     );
   }
 
