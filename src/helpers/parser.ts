@@ -2,7 +2,7 @@ import { CodeHealth, ReportOutput, VMDAnalysis, VMDOutput } from "../types.js";
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { tagsRemover } from "./tags.js";
-import { EMPTY_REPORT, ERROR_WEIGHT } from "./constants.js";
+import { ERROR_WEIGHT } from "./constants.js";
 
 /**
  * Parse the analysis output from the file system.
@@ -66,7 +66,7 @@ export function compareAnalysisResults(
       output: [],
       codeHealthOutput: [],
       reportOutput: {},
-      codeHealth: EMPTY_REPORT
+      codeHealth: oldAnalysis.codeHealth
     }
   };
 
