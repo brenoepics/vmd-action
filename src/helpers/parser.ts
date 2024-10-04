@@ -120,8 +120,15 @@ function getRelativeResults(
   ) {
     return undefined;
   }
+  const mergedEntries: [string, ReportOutput[] | undefined][] = Object.entries({
+    ...Object.fromEntries(
+      Object.keys(oldAnalysis.reportOutput).map(key => [key, undefined])
+    ),
+    ...prAnalysis.reportOutput
+  });
+
   const newIssues: issuesOutput = calculateNewIssues(
-    Object.entries(prAnalysis.reportOutput),
+    mergedEntries,
     oldAnalysis
   );
   const newErrors: number = getFilteredIssues(
