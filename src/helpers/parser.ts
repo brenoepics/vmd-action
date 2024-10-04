@@ -31,7 +31,14 @@ export function parseAnalysisOutput(
   }
 }
 
-function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
+function getRelativeHealth(
+  prHealth: CodeHealth,
+  baseHealth: CodeHealth | undefined
+) {
+  if (!baseHealth) {
+    return prHealth;
+  }
+
   const codeHealth: CodeHealth = prHealth;
 
   codeHealth.errors -= baseHealth.errors;
@@ -52,48 +59,45 @@ function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
 }
 
 /**
- * Compare the analysis results of the main branch and the pull request branch.
- * @param oldAnalysis - The analysis results of the main branch.
- * @param prBranchAnalysis - The analysis results of the pull request branch.
- * @returns The new issues introduced by the pull request branch.
+ * Calculate the total number of errors and warnings from the report output.
+ * @param reportOutput - The report output to calculate from.
+ * @returns An object containing the total errors and warnings.
  */
-export function compareAnalysisResults(
-  oldAnalysis: VMDAnalysis,
-  prBranchAnalysis: VMDAnalysis
-): VMDOutput {
-  const newIssues: VMDOutput = {
-    fullAnalysis: {
-      output: [],
-      codeHealthOutput: [],
-      reportOutput: {},
-      codeHealth: oldAnalysis.codeHealth
-    }
-  };
+function calculateIssues(reportOutput: {
+  [key: string]: ReportOutput[] | undefined;
+}): { totalErrors: number; totalWarnings: number } {
+  let totalErrors: number = 0;
+  let totalWarnings: number = 0;
 
-  if (
-    prBranchAnalysis.codeHealth === undefined ||
-    oldAnalysis.codeHealth === undefined
-  ) {
-    return newIssues;
+  for (const issues of Object.values(reportOutput)) {
+    if (!issues) {
+      continue;
+    }
+    for (const issue of issues) {
+      if (issue.level === "error") {
+        totalErrors++;
+      } else if (issue.level === "warning") {
+        totalWarnings++;
+      }
+    }
   }
 
-  newIssues.prHealth = getRelativeHealth(
-    prBranchAnalysis.codeHealth,
-    oldAnalysis.codeHealth
-  );
+  return { totalErrors, totalWarnings };
+}
 
-  const prBranchFiles: [string, ReportOutput[] | undefined][] = Object.entries(
-    prBranchAnalysis.reportOutput
-  );
-
+function calculateNewIssues(
+  prBranchFiles: [string, ReportOutput[] | undefined][],
+  output: VMDOutput,
+  oldAnalysis: VMDAnalysis
+) {
   for (const [file, issues] of prBranchFiles) {
     if (!issues) {
-      newIssues.fullAnalysis.reportOutput[file] = undefined;
+      output.fullAnalysis.reportOutput[file] = undefined;
       continue;
     }
 
     if (!oldAnalysis.reportOutput[file]) {
-      newIssues.fullAnalysis.reportOutput[file] = issues;
+      output.fullAnalysis.reportOutput[file] = issues;
       continue;
     }
 
@@ -103,9 +107,55 @@ export function compareAnalysisResults(
       issue => !oldIssues.some(oldIssue => oldIssue.id === issue.id)
     );
     if (onlyNewIssues.length > 0) {
-      newIssues.fullAnalysis.reportOutput[file] = onlyNewIssues;
+      output.fullAnalysis.reportOutput[file] = onlyNewIssues;
     }
   }
+}
 
-  return newIssues;
+/**
+ * Compare the analysis results of the main branch and the pull request branch.
+ * @param oldAnalysis - The analysis results of the main branch.
+ * @param prBranchAnalysis - The analysis results of the pull request branch.
+ * @returns The new issues introduced by the pull request branch.
+ */
+export function compareAnalysisResults(
+  oldAnalysis: VMDAnalysis,
+  prBranchAnalysis: VMDAnalysis
+): VMDOutput {
+  const output: VMDOutput = {
+    fullAnalysis: {
+      output: [],
+      codeHealthOutput: [],
+      reportOutput: {},
+      codeHealth: oldAnalysis.codeHealth
+    },
+    prHealth: prBranchAnalysis.codeHealth
+  };
+
+  if (
+    prBranchAnalysis.codeHealth === undefined ||
+    oldAnalysis.codeHealth === undefined
+  ) {
+    return output;
+  }
+
+  calculateNewIssues(
+    Object.entries(prBranchAnalysis.reportOutput),
+    output,
+    oldAnalysis
+  );
+
+  const total: { totalErrors: number; totalWarnings: number } = calculateIssues(
+    output.fullAnalysis.reportOutput
+  );
+
+  prBranchAnalysis.codeHealth.errors = total.totalErrors;
+  prBranchAnalysis.codeHealth.warnings = total.totalWarnings;
+
+  output.prHealth = getRelativeHealth(
+    prBranchAnalysis.codeHealth,
+    output.fullAnalysis.codeHealth
+  );
+
+  return output;
 }
