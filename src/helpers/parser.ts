@@ -40,10 +40,10 @@ function getRelativeHealth({
   warnings: number;
   linesCount: number;
 }): number | null {
-  const errorsWeight: number = errors * ERROR_WEIGHT + warnings;
+  const codeSmells: number = errors * ERROR_WEIGHT + warnings;
 
   if (linesCount > 0) {
-    return Math.ceil((1 - errorsWeight / linesCount) * 100);
+    return Math.ceil((1 - codeSmells / linesCount) * 100);
   }
 
   return null;
