@@ -5,7 +5,7 @@ import { getHealthOutput } from "./badgeTemplate.js";
 import { ASSETS_URL, ISSUES_URL } from "../helpers/constants.js";
 
 export const watermark: string = `<!-- VMD Analysis Comment -->`;
-const LOGO_URL: string = `${ASSETS_URL}/src/templates/logo.png`;
+const LOGO_URL: string = `${ASSETS_URL}icons/logo.png`;
 const commentTemplate: string = `${watermark}
 ## ![logo](${LOGO_URL}) Vue Mess Detector Analysis Results
 
@@ -17,7 +17,6 @@ const commentTemplate: string = `${watermark}
 
 ###### For any issues or feedback, feel free to [report them here](${ISSUES_URL}).
 `;
-
 export const coverageInfo: string = `
 🚨 Errors: {{errors}}
 ⚠️ Warnings: {{warnings}}
