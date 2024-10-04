@@ -31,20 +31,18 @@ export function parseAnalysisOutput(
   }
 }
 
-function getRelativeHealth({
-  errors,
-  warnings,
-  linesChanged
-}: {
+type RelativeHealth = {
   errors: number;
   warnings: number;
   linesChanged: number;
-}): number | null {
-  const codeSmells: number = errors * ERROR_WEIGHT + warnings;
+};
+
+function getRelativeHealth(health: RelativeHealth): number | null {
+  const codeSmells: number = health.errors * ERROR_WEIGHT + health.warnings;
 
   return Math.max(
     0,
-    Math.min(100, Math.ceil((1 - codeSmells / linesChanged) * 100))
+    Math.min(100, Math.ceil((1 - codeSmells / health.linesChanged) * 100))
   );
 }
 
@@ -54,7 +52,7 @@ type issuesOutput = {
 };
 
 function calculateNewIssues(
-  prBranchFiles: [string, ReportOutput[] | undefined][],
+  files: [string, ReportOutput[] | undefined][],
   oldAnalysis: VMDAnalysis
 ): issuesOutput {
   const output: issuesOutput = {
@@ -62,15 +60,17 @@ function calculateNewIssues(
     report: {}
   };
 
-  for (const [file, issues] of prBranchFiles) {
-    if (!issues) {
-      output.report[file] = undefined;
-      continue;
-    }
-
+  for (const [file, issues] of files) {
     const oldIssues: ReportOutput[] | undefined =
       oldAnalysis.reportOutput[file];
 
+    if (!issues) {
+      output.report[file] = undefined;
+      if (oldIssues) {
+        output.issues.fixedIssues.push(...oldIssues);
+      }
+      continue;
+    }
     if (!oldIssues) {
       output.report[file] = issues;
       output.issues.newIssues.push(...issues);
