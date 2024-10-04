@@ -1,4 +1,9 @@
-import { CodeHealth, ReportOutput, VMDAnalysis } from "../types.js";
+import {
+  CodeHealth,
+  PRCodeHealth,
+  ReportOutput,
+  VMDAnalysis
+} from "../types.js";
 import * as github from "@actions/github";
 import { artifactText } from "./commentTemplate.js";
 
@@ -23,21 +28,27 @@ export function getCoverageInfo(result: VMDAnalysis): string {
   return result.codeHealthOutput.map(element => element.info).join("\n");
 }
 
+function replacePlaceholders(
+  message: string,
+  data: PRCodeHealth | CodeHealth
+): string {
+  for (const [key, value] of Object.entries(data)) {
+    const regex: RegExp = new RegExp(`{{${key}}}`, "g");
+    message = message.replace(regex, String(value));
+  }
+  return message;
+}
+
 export function replaceCodeHealth(
   message: string,
-  health: CodeHealth | undefined,
+  health: PRCodeHealth | CodeHealth | undefined,
   template: string
 ): string {
   if (!health) {
     return message.replace(/{{coverageInfo}}/g, "No health data available");
   }
-  return message
-    .replace(/{{coverageInfo}}/g, template)
-    .replace(/{{errors}}/g, health.errors.toLocaleString())
-    .replace(/{{warnings}}/g, health.warnings.toLocaleString())
-    .replace(/{{linesCount}}/g, health.linesCount.toLocaleString())
-    .replace(/{{filesCount}}/g, health.filesCount.toLocaleString())
-    .replace(/{{points}}/g, health.points ? health.points.toString() : "0");
+  message = message.replace(/{{coverageInfo}}/g, template);
+  return replacePlaceholders(message, health);
 }
 
 export function replaceRepoData(

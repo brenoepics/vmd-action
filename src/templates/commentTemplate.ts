@@ -25,14 +25,16 @@ export const coverageInfo: string = `
 `;
 
 export const newCoverageInfo: string = `
-🚨 New Errors: {{errors}}
-⚠️ New Warnings: {{warnings}}
-📝 New Lines: {{linesCount}}
-📁 New Files: {{filesCount}}
+🚨 New Errors: {{newErrors}}
+⚠️ New Warnings: {{newWarnings}}
+✅ Fixed Errors: {{fixedErrors}}
+🔧 Fixed Warnings: {{fixedWarnings}}
+📝 Total Lines: {{linesCount}}
+📁 Total Files: {{filesCount}}
 `;
 
 export const artifactText: string = `
-🔍 [Download Full Analysis Details](../actions/runs/{{runId}}/artifacts/{{artifactId}})
+🔍 [Download Full Analysis Details](https://github.com/{{repositoryOwner}}/{{repository}}/actions/runs/{{runId}}/artifacts/{{artifactId}})
 `;
 
 export function getCommentTemplate(

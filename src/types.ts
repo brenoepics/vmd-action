@@ -9,10 +9,29 @@ export interface VMDAnalysis {
   codeHealth?: CodeHealth;
 }
 
+export interface IssuesOutput {
+  newIssues: ReportOutput[];
+  fixedIssues: ReportOutput[];
+}
+
+export type relativeAnalysis = VMDAnalysis & { prCodeHealth?: PRCodeHealth } & {
+  issues?: IssuesOutput;
+};
+
 export type VMDOutput = {
-  relativeAnalysis?: VMDAnalysis & { prCodeHealth?: CodeHealth };
+  relativeAnalysis?: relativeAnalysis;
   fullAnalysis: VMDAnalysis;
 };
+
+export interface PRCodeHealth {
+  newErrors: number;
+  newWarnings: number;
+  fixedErrors: number;
+  fixedWarnings: number;
+  linesCount: number;
+  filesCount: number;
+  points: number | null;
+}
 
 export interface CodeHealth {
   errors: number;
