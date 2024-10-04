@@ -4,6 +4,7 @@ import {
   MEDIUM_HEALTH_THRESHOLD,
   OK_HEALTH_THRESHOLD
 } from "../helpers/constants.js";
+import { VMDOutput } from "../types.js";
 
 const baseUrl: string = "https://img.shields.io/badge/";
 
@@ -46,17 +47,17 @@ function getHealthColor(percentage: number) {
   return "#2ecc71";
 }
 
-export function getCoverageBadge(
+export function getHealthBadge(
+  label: string,
   percentage: number | undefined | string | null
 ): string {
   let color: string = "blue";
-  const label: string = "Code Health";
 
   if (percentage === undefined || percentage == null) {
     percentage = "N/A";
     color = "#8c8c8c";
     core.warning(
-      "No code health data found in the analysis output! you may need to update vue-mess-detector to >= 0.54.1"
+      "No code health data or negative percentage found in the analysis output! you may need to update vue-mess-detector to >= 0.54.1"
     );
   }
 
@@ -73,4 +74,28 @@ export function getCoverageBadge(
   });
 
   return `![${label}](${badgeUrl})`;
+}
+
+export function getHealthOutput(output: VMDOutput): string[] {
+  const badges: string[] = [];
+  if (output.relativeAnalysis?.prCodeHealth) {
+    badges.push(
+      getHealthBadge(
+        "PR Code Health",
+        output.relativeAnalysis.prCodeHealth.points
+      )
+    );
+  }
+
+  if (output.fullAnalysis.codeHealth) {
+    badges.push(
+      getHealthBadge("Full Code Health", output.fullAnalysis.codeHealth.points)
+    );
+  }
+
+  if (badges.length === 0) {
+    badges.push(getHealthBadge("Code Health", null));
+  }
+
+  return badges;
 }

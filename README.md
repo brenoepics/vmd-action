@@ -61,9 +61,9 @@ jobs:
           node-version: '20'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.5
-        # with:
-          # check inputs for full args list
+        uses: brenoepics/vmd-action@v0.0.6
+          # with:
+        # check inputs for full args list
 
 ```
 
@@ -79,7 +79,7 @@ artifacts.
 
 | Input             | Description                                          | Required | Default                                                 |
 |-------------------|------------------------------------------------------|----------|---------------------------------------------------------|
-| github-token      | GitHub token for commenting on pull requests         | `false`  |                                                         |
+| github-token      | GitHub token for commenting on pull requests         | `false`  | `github.token`                                          |
 | version           | Version of Vue Mess Detector                         | `true`   | [`latest`](https://github.com/rrd108/vue-mess-detector) |
 | skipInstall       | Skip the installation of Vue Mess Detector           | `true`   | `false`                                                 |
 | skipBots          | Skip running analysis on pull requests from bots     | `true`   | `true`                                                  |

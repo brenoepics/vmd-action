@@ -1,16 +1,13 @@
-import { VMDAnalysis } from "../types.js";
-import {
-  getCoverageInfo,
-  replaceBadges,
-  replaceCodeHealth,
-  replaceRepoData
-} from "./utils.js";
+import { VMDOutput } from "../types.js";
+import { replaceBadges, replaceCodeHealth, replaceRepoData } from "./utils.js";
 import { getReportTemplate } from "./reportTemplate.js";
+import { getHealthOutput } from "./badgeTemplate.js";
+import { ASSETS_URL, ISSUES_URL } from "../helpers/constants.js";
 
 export const watermark: string = `<!-- VMD Analysis Comment -->`;
-
+const LOGO_URL: string = `${ASSETS_URL}icons/logo.png`;
 const commentTemplate: string = `${watermark}
-## 📊 Vue Mess Detector Analysis Results
+## ![logo](${LOGO_URL}) Vue Mess Detector Analysis Results
 
 #### {{coverageBadge}}
 {{coverageInfo}}
@@ -18,9 +15,8 @@ const commentTemplate: string = `${watermark}
 {{reportBlock}}
 {{artifactText}}
 
-###### For any issues or feedback, feel free to [report them here](https://github.com/brenoepics/vmd-action/issues/).
+###### For any issues or feedback, feel free to [report them here](${ISSUES_URL}).
 `;
-
 export const coverageInfo: string = `
 🚨 Errors: {{errors}}
 ⚠️ Warnings: {{warnings}}
@@ -29,30 +25,52 @@ export const coverageInfo: string = `
 `;
 
 export const newCoverageInfo: string = `
-🚨 New Errors: {{errors}}
-⚠️ New Warnings: {{warnings}}
-📝 New Lines: {{linesCount}}
-📁 New Files: {{filesCount}}
+🚨 New Errors: {{newErrors}}
+⚠️ New Warnings: {{newWarnings}}
+✅ Fixed Errors: {{fixedErrors}}
+🔧 Fixed Warnings: {{fixedWarnings}}
+📝 Total Lines: {{linesCount}}
+📁 Total Files: {{filesCount}}
 `;
 
 export const artifactText: string = `
-🔍 [Download Full Analysis Details](../actions/runs/{{runId}}/artifacts/{{artifactId}})
+🔍 [Download Full Analysis Details](https://github.com/{{repositoryOwner}}/{{repositoryName}}/actions/runs/{{runId}}/artifacts/{{artifactId}})
 `;
 
 export function getCommentTemplate(
-  result: VMDAnalysis,
-  artifactId: number | undefined,
-  isRelative: boolean = false
+  result: VMDOutput,
+  artifactId: number | undefined
 ): string {
-  const coverageTemplate: string = isRelative ? newCoverageInfo : coverageInfo;
+  const coverageTemplate: string = result.relativeAnalysis
+    ? newCoverageInfo
+    : coverageInfo;
   let message: string = replaceRepoData(commentTemplate, artifactId);
-  if (result.codeHealth) {
-    message = replaceCodeHealth(message, result.codeHealth, coverageTemplate);
-  } else {
-    message = message.replace(/{{coverageInfo}}/g, getCoverageInfo(result));
+  if (result.relativeAnalysis) {
+    message = replaceCodeHealth(
+      message,
+      result.relativeAnalysis.prCodeHealth,
+      coverageTemplate
+    );
+    message = replaceBadges(message, getHealthOutput(result));
+    message = message.replace(
+      /{{reportBlock}}/g,
+      getReportTemplate(
+        "New Issues",
+        result.relativeAnalysis.issues?.newIssues ?? {}
+      )
+    );
+    return message;
   }
 
-  message = replaceBadges(message, result);
-  message = message.replace(/{{reportBlock}}/g, getReportTemplate(result));
+  message = replaceCodeHealth(
+    message,
+    result.fullAnalysis.codeHealth,
+    coverageTemplate
+  );
+  message = replaceBadges(message, getHealthOutput(result));
+  message = message.replace(
+    /{{reportBlock}}/g,
+    getReportTemplate("Issues", result.fullAnalysis.reportOutput)
+  );
   return message;
 }

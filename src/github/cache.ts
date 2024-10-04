@@ -17,17 +17,17 @@ export async function saveCache(
 }
 
 export async function restoreCache(
-  branch: string
+  branch: string,
+  cachePath: string
 ): Promise<VMDAnalysis | undefined> {
   const cacheId: string = `vmd-analysis-${branch}`;
-  const cachePaths: string[] = ["vmd-analysis.json"];
   try {
     const cacheKey: string | undefined = await cache.restoreCache(
-      cachePaths,
+      [cachePath],
       cacheId
     );
     if (cacheKey) {
-      return parseAnalysisOutput("vmd-analysis.json");
+      return parseAnalysisOutput(cachePath);
     }
   } catch (error) {
     core.warning(`Failed to restore cache: ${(error as Error).message}`);
