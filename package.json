@@ -1,6 +1,6 @@
 {
   "name": "vmd-action",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
@@ -34,7 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vercel/ncc": "^0.38.2",
-    "@vitest/coverage-v8": "2.1.1",
+    "@vitest/coverage-v8": "2.1.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
@@ -43,7 +43,7 @@
     "rimraf": "6.0.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2",
-    "vitest": "2.1.1"
+    "vitest": "2.1.2"
   },
   "packageManager": "pnpm@9.9.0"
 }

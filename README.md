@@ -61,8 +61,8 @@ jobs:
 
       - name: Vue Mess Detector Analysis
         uses: brenoepics/vmd-action@v0.0.6
-        # with:
-        # check inputs for full args list
+          # with:
+            # check inputs for full args list
 
 ```
 

@@ -1,7 +1,11 @@
-import { CodeHealth, ReportOutput, VMDAnalysis } from "../types.js";
+import {
+  CodeHealth,
+  PRCodeHealth,
+  ReportOutput,
+  VMDAnalysis
+} from "../types.js";
 import * as github from "@actions/github";
 import { artifactText } from "./commentTemplate.js";
-import { getCoverageBadge } from "./badgeTemplate.js";
 
 export function getReportAsMap(report: {
   [p: string]: ReportOutput[] | undefined;
@@ -24,18 +28,27 @@ export function getCoverageInfo(result: VMDAnalysis): string {
   return result.codeHealthOutput.map(element => element.info).join("\n");
 }
 
+function replacePlaceholders(
+  message: string,
+  data: PRCodeHealth | CodeHealth
+): string {
+  for (const [key, value] of Object.entries(data)) {
+    const regex: RegExp = new RegExp(`{{${key}}}`, "g");
+    message = message.replace(regex, String(value));
+  }
+  return message;
+}
+
 export function replaceCodeHealth(
   message: string,
-  health: CodeHealth,
+  health: PRCodeHealth | CodeHealth | undefined,
   template: string
 ): string {
-  return message
-    .replace(/{{coverageInfo}}/g, template)
-    .replace(/{{errors}}/g, health.errors.toLocaleString())
-    .replace(/{{warnings}}/g, health.warnings.toLocaleString())
-    .replace(/{{linesCount}}/g, health.linesCount.toLocaleString())
-    .replace(/{{filesCount}}/g, health.filesCount.toLocaleString())
-    .replace(/{{points}}/g, health.points ? health.points.toString() : "0");
+  if (!health) {
+    return message.replace(/{{coverageInfo}}/g, "No health data available");
+  }
+  message = message.replace(/{{coverageInfo}}/g, template);
+  return replacePlaceholders(message, health);
 }
 
 export function replaceRepoData(
@@ -46,13 +59,10 @@ export function replaceRepoData(
     .replace(/{{artifactText}}/g, artifactId ? artifactText : "")
     .replace(/{{artifactId}}/g, String(artifactId ?? 0))
     .replace(/{{runId}}/g, github.context.runId.toString())
-    .replace(/{{repository/g, github.context.repo.repo)
-    .replace(/{{repositoryOwner/g, github.context.repo.owner);
+    .replace(/{{repositoryName}}/g, github.context.repo.repo)
+    .replace(/{{repositoryOwner}}/g, github.context.repo.owner);
 }
 
-export function replaceBadges(message: string, result: VMDAnalysis): string {
-  return message.replace(
-    /{{coverageBadge}}/g,
-    getCoverageBadge(result.codeHealth?.points)
-  );
+export function replaceBadges(message: string, badges: string[]): string {
+  return message.replace(/{{coverageBadge}}/g, badges.join(" "));
 }
