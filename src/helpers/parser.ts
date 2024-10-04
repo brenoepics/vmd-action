@@ -34,19 +34,18 @@ export function parseAnalysisOutput(
 function getRelativeHealth({
   errors,
   warnings,
-  linesCount
+  linesChanged
 }: {
   errors: number;
   warnings: number;
-  linesCount: number;
+  linesChanged: number;
 }): number | null {
   const codeSmells: number = errors * ERROR_WEIGHT + warnings;
 
-  if (linesCount > 0) {
-    return Math.ceil((1 - codeSmells / linesCount) * 100);
-  }
-
-  return null;
+  return Math.max(
+    0,
+    Math.min(100, Math.ceil((1 - codeSmells / linesChanged) * 100))
+  );
 }
 
 type issuesOutput = {
@@ -112,17 +111,17 @@ type RelativeResults = {
 };
 
 function getRelativeResults(
-  prBranchAnalysis: VMDAnalysis,
+  prAnalysis: VMDAnalysis,
   oldAnalysis: VMDAnalysis
 ): RelativeResults | undefined {
   if (
-    prBranchAnalysis.codeHealth === undefined ||
+    prAnalysis.codeHealth === undefined ||
     oldAnalysis.codeHealth === undefined
   ) {
     return undefined;
   }
   const newIssues: issuesOutput = calculateNewIssues(
-    Object.entries(prBranchAnalysis.reportOutput),
+    Object.entries(prAnalysis.reportOutput),
     oldAnalysis
   );
   const newErrors: number = getFilteredIssues(
@@ -143,9 +142,9 @@ function getRelativeResults(
   ).length;
 
   const newPoints: number | null = getRelativeHealth({
-    errors: newErrors,
-    warnings: newWarnings,
-    linesCount: prBranchAnalysis.codeHealth.linesCount
+    errors: newErrors + oldAnalysis.codeHealth.errors - fixedErrors,
+    warnings: newWarnings + oldAnalysis.codeHealth.warnings - fixedWarnings,
+    linesChanged: prAnalysis.codeHealth.linesCount
   });
   return {
     newIssues,
