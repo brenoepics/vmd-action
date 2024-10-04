@@ -5,7 +5,7 @@ import {
 } from "./helpers/package.js";
 import * as core from "@actions/core";
 import { ActionInputs, getPath } from "./github/utils.js";
-import { VMDAnalysis } from "./types.js";
+import { VMDAnalysis, VMDOutput } from "./types.js";
 import { uploadOutputArtifact } from "./github/artifact.js";
 import { commentOnPullRequest } from "./github/comments.js";
 import { getCommentTemplate } from "./templates/commentTemplate.js";
@@ -82,7 +82,11 @@ export async function commentFullReport(
   artifact: number,
   input: ActionInputs
 ): Promise<void> {
-  const commentBody: string = getCommentTemplate(analysisOutput, artifact);
+  const output: VMDOutput = {
+    fullAnalysis: analysisOutput
+  };
+
+  const commentBody: string = getCommentTemplate(output, artifact);
   await core.summary.addRaw(commentBody).write();
   if (IS_PULL_REQUEST && input.commentsEnabled)
     await commentOnPullRequest(commentBody);
@@ -114,15 +118,11 @@ export async function handleResult(
     await commentFullReport(analysisOutput, artifact, input);
     return;
   }
-  const newIssues: VMDAnalysis = compareAnalysisResults(
+  const newIssues: VMDOutput = compareAnalysisResults(
     oldAnalysis,
     analysisOutput
   );
-  const newIssuesCommentBody: string = getCommentTemplate(
-    newIssues,
-    artifact,
-    true
-  );
+  const newIssuesCommentBody: string = getCommentTemplate(newIssues, artifact);
   await core.summary.addRaw(newIssuesCommentBody).write();
   if (input.commentsEnabled) {
     await commentOnPullRequest(newIssuesCommentBody);
@@ -133,7 +133,7 @@ async function runUploadGroup(input: ActionInputs) {
   const analysisOutput: VMDAnalysis | undefined =
     parseAnalysisOutput(REPORT_PATH);
   const artifact: number | undefined = await uploadOutputArtifact(REPORT_PATH);
-  if (!(analysisOutput === undefined || artifact === undefined)) {
+  if (analysisOutput !== undefined && artifact !== undefined) {
     await handleResult(input, analysisOutput, artifact);
   }
 }

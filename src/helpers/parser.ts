@@ -1,4 +1,4 @@
-import { CodeHealth, ReportOutput, VMDAnalysis } from "../types.js";
+import { CodeHealth, ReportOutput, VMDAnalysis, VMDOutput } from "../types.js";
 import fs from "node:fs";
 import * as core from "@actions/core";
 import { tagsRemover } from "./tags.js";
@@ -39,9 +39,11 @@ function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
   codeHealth.linesCount -= baseHealth.linesCount;
   codeHealth.filesCount -= baseHealth.filesCount;
   if (codeHealth.linesCount > 0) {
-    const points: number =
+    const errorsWeight: number =
       codeHealth.errors * ERROR_WEIGHT + codeHealth.warnings;
-    codeHealth.points = Math.ceil((1 - points / codeHealth.linesCount) * 100);
+    codeHealth.points = Math.ceil(
+      (1 - errorsWeight / codeHealth.linesCount) * 100
+    );
   } else {
     codeHealth.points = 100;
   }
@@ -58,12 +60,14 @@ function getRelativeHealth(prHealth: CodeHealth, baseHealth: CodeHealth) {
 export function compareAnalysisResults(
   oldAnalysis: VMDAnalysis,
   prBranchAnalysis: VMDAnalysis
-): VMDAnalysis {
-  const newIssues: VMDAnalysis = {
-    output: [],
-    codeHealthOutput: [],
-    reportOutput: {},
-    codeHealth: EMPTY_REPORT
+): VMDOutput {
+  const newIssues: VMDOutput = {
+    fullAnalysis: {
+      output: [],
+      codeHealthOutput: [],
+      reportOutput: {},
+      codeHealth: EMPTY_REPORT
+    }
   };
 
   if (
@@ -73,7 +77,7 @@ export function compareAnalysisResults(
     return newIssues;
   }
 
-  newIssues.codeHealth = getRelativeHealth(
+  newIssues.prHealth = getRelativeHealth(
     prBranchAnalysis.codeHealth,
     oldAnalysis.codeHealth
   );
@@ -84,21 +88,22 @@ export function compareAnalysisResults(
 
   for (const [file, issues] of prBranchFiles) {
     if (!issues) {
-      newIssues.reportOutput[file] = undefined;
+      newIssues.fullAnalysis.reportOutput[file] = undefined;
       continue;
     }
 
-    if (oldAnalysis.reportOutput[file]) {
-      const oldIssues: ReportOutput[] | undefined =
-        oldAnalysis.reportOutput[file];
-      const onlyNewIssues: ReportOutput[] = issues.filter(
-        issue => !oldIssues.some(oldIssue => oldIssue.id === issue.id)
-      );
-      if (onlyNewIssues.length > 0) {
-        newIssues.reportOutput[file] = onlyNewIssues;
-      }
-    } else {
-      newIssues.reportOutput[file] = issues;
+    if (!oldAnalysis.reportOutput[file]) {
+      newIssues.fullAnalysis.reportOutput[file] = issues;
+      continue;
+    }
+
+    const oldIssues: ReportOutput[] | undefined =
+      oldAnalysis.reportOutput[file];
+    const onlyNewIssues: ReportOutput[] = issues.filter(
+      issue => !oldIssues.some(oldIssue => oldIssue.id === issue.id)
+    );
+    if (onlyNewIssues.length > 0) {
+      newIssues.fullAnalysis.reportOutput[file] = onlyNewIssues;
     }
   }
 

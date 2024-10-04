@@ -4,6 +4,7 @@ import {
   MEDIUM_HEALTH_THRESHOLD,
   OK_HEALTH_THRESHOLD
 } from "../helpers/constants.js";
+import { VMDOutput } from "../types.js";
 
 const baseUrl: string = "https://img.shields.io/badge/";
 
@@ -47,10 +48,10 @@ function getHealthColor(percentage: number) {
 }
 
 export function getCoverageBadge(
+  label: string,
   percentage: number | undefined | string | null
 ): string {
   let color: string = "blue";
-  const label: string = "Code Health";
 
   if (percentage === undefined || percentage == null) {
     percentage = "N/A";
@@ -73,4 +74,22 @@ export function getCoverageBadge(
   });
 
   return `![${label}](${badgeUrl})`;
+}
+
+export function getHealthBadges(output: VMDOutput): string[] {
+  const badges: string[] = [];
+  if (output.prHealth) {
+    badges.push(getCoverageBadge("PR Code Health", output.prHealth.points));
+  }
+
+  if (output.fullAnalysis.codeHealth) {
+    badges.push(
+      getCoverageBadge(
+        "Full Code Health",
+        output.fullAnalysis.codeHealth.points
+      )
+    );
+  }
+
+  return badges;
 }

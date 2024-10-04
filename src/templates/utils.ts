@@ -1,7 +1,6 @@
 import { CodeHealth, ReportOutput, VMDAnalysis } from "../types.js";
 import * as github from "@actions/github";
 import { artifactText } from "./commentTemplate.js";
-import { getCoverageBadge } from "./badgeTemplate.js";
 
 export function getReportAsMap(report: {
   [p: string]: ReportOutput[] | undefined;
@@ -26,9 +25,12 @@ export function getCoverageInfo(result: VMDAnalysis): string {
 
 export function replaceCodeHealth(
   message: string,
-  health: CodeHealth,
+  health: CodeHealth | undefined,
   template: string
 ): string {
+  if (!health) {
+    return message.replace(/{{coverageInfo}}/g, "No health data available");
+  }
   return message
     .replace(/{{coverageInfo}}/g, template)
     .replace(/{{errors}}/g, health.errors.toLocaleString())
@@ -50,9 +52,6 @@ export function replaceRepoData(
     .replace(/{{repositoryOwner/g, github.context.repo.owner);
 }
 
-export function replaceBadges(message: string, result: VMDAnalysis): string {
-  return message.replace(
-    /{{coverageBadge}}/g,
-    getCoverageBadge(result.codeHealth?.points)
-  );
+export function replaceBadges(message: string, badges: string[]): string {
+  return message.replace(/{{coverageBadge}}/g, badges.join(" "));
 }

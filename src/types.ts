@@ -9,6 +9,11 @@ export interface VMDAnalysis {
   codeHealth?: CodeHealth;
 }
 
+export type VMDOutput = {
+  fullAnalysis: VMDAnalysis;
+  prHealth?: CodeHealth;
+};
+
 export interface CodeHealth {
   errors: number;
   warnings: number;

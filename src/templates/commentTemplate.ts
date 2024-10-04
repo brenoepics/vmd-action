@@ -1,11 +1,7 @@
-import { VMDAnalysis } from "../types.js";
-import {
-  getCoverageInfo,
-  replaceBadges,
-  replaceCodeHealth,
-  replaceRepoData
-} from "./utils.js";
+import { VMDOutput } from "../types.js";
+import { replaceBadges, replaceCodeHealth, replaceRepoData } from "./utils.js";
 import { getReportTemplate } from "./reportTemplate.js";
+import { getHealthBadges } from "./badgeTemplate.js";
 
 export const watermark: string = `<!-- VMD Analysis Comment -->`;
 
@@ -40,19 +36,27 @@ export const artifactText: string = `
 `;
 
 export function getCommentTemplate(
-  result: VMDAnalysis,
-  artifactId: number | undefined,
-  isRelative: boolean = false
+  result: VMDOutput,
+  artifactId: number | undefined
 ): string {
-  const coverageTemplate: string = isRelative ? newCoverageInfo : coverageInfo;
+  const coverageTemplate: string = result.prHealth
+    ? newCoverageInfo
+    : coverageInfo;
   let message: string = replaceRepoData(commentTemplate, artifactId);
-  if (result.codeHealth) {
-    message = replaceCodeHealth(message, result.codeHealth, coverageTemplate);
+  if (result.prHealth) {
+    message = replaceCodeHealth(message, result.prHealth, coverageTemplate);
+    message = replaceBadges(message, getHealthBadges(result));
   } else {
-    message = message.replace(/{{coverageInfo}}/g, getCoverageInfo(result));
+    message = replaceCodeHealth(
+      message,
+      result.fullAnalysis.codeHealth,
+      coverageTemplate
+    );
   }
 
-  message = replaceBadges(message, result);
-  message = message.replace(/{{reportBlock}}/g, getReportTemplate(result));
+  message = message.replace(
+    /{{reportBlock}}/g,
+    getReportTemplate(result.fullAnalysis)
+  );
   return message;
 }
