@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@actions/artifact':
-        specifier: 2.1.9
-        version: 2.1.9
+        specifier: 2.1.10
+        version: 2.1.10
       '@actions/cache':
         specifier: 3.2.4
         version: 3.2.4
@@ -69,8 +69,8 @@ importers:
 
 packages:
 
-  '@actions/artifact@2.1.9':
-    resolution: {integrity: sha512-f9JXC9JrwramDRJHZiIOKJo3PGw/V3riYegLj5kHi8YEJ2k72TNUd1zDW1BG50ILnzJ0cp1faDVJ2pSdolRQfg==}
+  '@actions/artifact@2.1.10':
+    resolution: {integrity: sha512-3c6DP+ZiTgHuXYaNO3W0MnoK//ZfBnJEam1SpOZuR2epNWO7m8Wh72IdhiKMib4DMyNNt8924TOUaR2X4cRPHQ==}
 
   '@actions/cache@3.2.4':
     resolution: {integrity: sha512-RuHnwfcDagtX+37s0ZWy7clbOfnZ7AlDJQ7k/9rzt2W4Gnwde3fa/qjSjVuz4vLcLIpc7fUob27CMrqiWZytYA==}
@@ -1892,7 +1892,7 @@ packages:
 
 snapshots:
 
-  '@actions/artifact@2.1.9':
+  '@actions/artifact@2.1.10':
     dependencies:
       '@actions/core': 1.11.1
       '@actions/github': 5.1.1
