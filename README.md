@@ -20,6 +20,50 @@ request alerts and display badges effortlessly.
 
 </details>
 
+
+## Usage
+
+See [action.yml](action.yml)
+
+<!-- start usage -->
+```yaml
+- uses: brenoepics/vmd-action@v0.0.6
+  with:
+    # GitHub token for commenting on pull requests
+    github-token: ''
+
+    # Version of Vue Mess Detector
+    version: 'latest'
+
+    # Skip the installation of Vue Mess Detector
+    skipInstall: 'false'
+
+    # Skip running analysis on pull requests from bots
+    skipBots: 'true'
+
+    # Comment on Pull requests?
+    commentsEnabled: 'true'
+
+    # Package manager to use
+    packageManager: ''
+
+    # Arguments to pass to Vue Mess Detector
+    runArgs: '--group=file'
+
+    # Entry point for Vue Mess Detector
+    entryPoint: './'
+
+    # Source directory to analyze
+    srcDir: 'src/'
+
+    # Delete old report comments on pull requests?
+    deleteOldComments: 'false'
+
+    # Compare the current branch with the target (PR only)
+    relativeMode: 'true'
+```
+<!-- end usage -->
+
 ## Installation
 
 > [!TIP]
@@ -27,10 +71,11 @@ request alerts and display badges effortlessly.
 
 You can add this action as a step in your [GitHub Actions](https://github.com/features/actions)
 workflow.
-Here's an example of how to
-use it:
 
-```yml
+<details>
+<summary>pnpm</summary>
+
+```yaml
 name: VMD Analysis
 
 on:
@@ -54,22 +99,138 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+          version: 'latest' # delete this line if you have packageManager defined in package.json
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Vue Mess Detector Analysis
         uses: brenoepics/vmd-action@v0.0.6
-          # with:
-            # check inputs for full args list
-
 ```
 
-## Usage
+</details>
 
-After installing the `vmd-action`, Once a pull request is opened, you will start receiving comments and report
-artifacts.
+<details>
+<summary>npm</summary>
+
+```yaml
+name: VMD Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect-mess:
+    runs-on: ubuntu-latest
+    name: Detect Vue Mess
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Vue Mess Detector Analysis
+        uses: brenoepics/vmd-action@v0.0.6
+```
+
+</details>
+
+<details>
+<summary>yarn</summary>
+
+```yaml
+name: VMD Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect-mess:
+    runs-on: ubuntu-latest
+    name: Detect Vue Mess
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Vue Mess Detector Analysis
+        uses: brenoepics/vmd-action@v0.0.6
+```
+
+</details>
+
+<details>
+<summary>bun</summary>
+
+```yaml
+name: VMD Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect-mess:
+    runs-on: ubuntu-latest
+    name: Detect Vue Mess
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 'latest'
+
+      - name: Vue Mess Detector Analysis
+        uses: brenoepics/vmd-action@v0.0.6
+```
+
+</details>
 
 ## Inputs
 
