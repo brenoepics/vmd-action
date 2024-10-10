@@ -20,50 +20,6 @@ request alerts and display badges effortlessly.
 
 </details>
 
-
-## Usage
-
-See [action.yml](action.yml)
-
-<!-- start usage -->
-```yaml
-- uses: brenoepics/vmd-action@v0.0.6
-  with:
-    # GitHub token for commenting on pull requests
-    github-token: ''
-
-    # Version of Vue Mess Detector
-    version: 'latest'
-
-    # Skip the installation of Vue Mess Detector
-    skipInstall: 'false'
-
-    # Skip running analysis on pull requests from bots
-    skipBots: 'true'
-
-    # Comment on Pull requests?
-    commentsEnabled: 'true'
-
-    # Package manager to use
-    packageManager: ''
-
-    # Arguments to pass to Vue Mess Detector
-    runArgs: '--group=file'
-
-    # Entry point for Vue Mess Detector
-    entryPoint: './'
-
-    # Source directory to analyze
-    srcDir: 'src/'
-
-    # Delete old report comments on pull requests?
-    deleteOldComments: 'false'
-
-    # Compare the current branch with the target (PR only)
-    relativeMode: 'true'
-```
-<!-- end usage -->
-
 ## Installation
 
 > [!TIP]
@@ -71,6 +27,8 @@ See [action.yml](action.yml)
 
 You can add this action as a step in your [GitHub Actions](https://github.com/features/actions)
 workflow.
+Here's an example of how to
+use it:
 
 <details>
 <summary>pnpm</summary>
@@ -103,7 +61,7 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-          version: 'latest' # delete this line if you have packageManager defined in package.json
+          version: 'latest'
 
       - name: Install Node.js
         uses: actions/setup-node@v4
@@ -231,6 +189,71 @@ jobs:
 ```
 
 </details>
+
+## Usage
+
+See [action.yml](action.yml)
+
+<!-- start usage -->
+```yaml
+- uses: brenoepics/vmd-action@v0.0.6
+  with:
+    # Personal access token (PAT) used to fetch the repository. The PAT is
+    # configured with the local git config, which enables your scripts to run
+    # authenticated git commands. The post-job step removes the PAT.
+    #
+    # We recommend using a service account with the least permissions necessary.
+    # Also when generating a new PAT, select the least scopes necessary.
+    #
+    # [Learn more about creating and using encrypted
+    # secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+    github-token: ''
+
+    # Version of Vue Mess Detector to use. This can be a specific version number
+    # or 'latest' to use the most recent version available.
+    version: ''
+
+    # If set to 'true', the action will skip the installation of Vue Mess Detector.
+    # This can be useful if Vue Mess Detector is already installed in your environment.
+    skipInstall: ''
+
+    # If set to 'true', the action will skip running analysis on pull requests
+    # created by bots. This can help reduce unnecessary analysis runs.
+    skipBots: ''
+
+    # If set to 'true', the action will post comments on pull requests with the
+    # results of the analysis. If set to 'false', no comments will be posted.
+    commentsEnabled: ''
+
+    # The package manager to use for installing dependencies. Supported values
+    # are 'npm', 'yarn', 'pnpm', and 'bun'. If not specified, the action will
+    # attempt to detect the package manager based on the lock file present in
+    # the repository.
+    packageManager: ''
+
+    # Additional arguments to pass to Vue Mess Detector when running the analysis.
+    # This can be used to customize the behavior of the analysis.
+    runArgs: ''
+
+    # The entry point for Vue Mess Detector. This is the directory where the
+    # analysis will start. If not specified, the current directory will be used.
+    entryPoint: ''
+
+    # The source directory to analyze. This should be the path to the directory
+    # containing the source code you want to analyze. If not specified, 'src/'
+    # will be used.
+    srcDir: ''
+
+    # If set to 'true', the action will delete old comments on pull requests
+    # before posting new ones. This can help keep the comment section clean.
+    deleteOldComments: ''
+
+    # If set to 'true', the action will generate a report comparing the current
+    # branch with the target branch. This can be useful for identifying changes
+    # introduced in a pull request.
+    relativeMode: ''
+```
+<!-- end usage -->
 
 ## Inputs
 

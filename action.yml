@@ -20,42 +20,65 @@ inputs:
     required: false
     default: ${{ github.token }}
   version:
-    description: "Version of Vue Mess Detector"
+    description: >
+      Version of Vue Mess Detector to use. This can be a specific version number
+      or 'latest' to use the most recent version available.
     required: true
     default: "latest"
   skipInstall:
-    description: "Skip the installation of Vue Mess Detector"
+    description: >
+      If set to 'true', the action will skip the installation of Vue Mess Detector.
+      This can be useful if Vue Mess Detector is already installed in your environment.
     required: true
     default: "false"
   skipBots:
-    description: "Skip analysis on pull requests from bots?"
+    description: >
+      If set to 'true', the action will skip running analysis on pull requests
+      created by bots. This can help reduce unnecessary analysis runs.
     required: true
     default: "true"
   commentsEnabled:
-    description: "Comment on Pull requests?"
+    description: >
+      If set to 'true', the action will post comments on pull requests with the
+      results of the analysis. If set to 'false', no comments will be posted.
     required: true
     default: "true"
   packageManager:
-    description: "Package manager to use"
+    description: >
+      The package manager to use for installing dependencies. Supported values
+      are 'npm', 'yarn', 'pnpm', and 'bun'. If not specified, the action will
+      attempt to detect the package manager based on the lock file present in
+      the repository.
     required: false
   runArgs:
-    description: "Arguments to pass to Vue Mess Detector"
+    description: >
+      Additional arguments to pass to Vue Mess Detector when running the analysis.
+      This can be used to customize the behavior of the analysis.
     default: "--group=file"
     required: false
   entryPoint:
-    description: "Entry point for Vue Mess Detector"
+    description: >
+      The entry point for Vue Mess Detector. This is the directory where the
+      analysis will start. If not specified, the current directory will be used.
     required: false
   srcDir:
-    description: "Source directory to analyze"
+    description: >
+      The source directory to analyze. This should be the path to the directory
+      containing the source code you want to analyze. If not specified, 'src/'
+      will be used.
     required: true
     default: "src/"
   deleteOldComments:
-    description: "Delete old comments on pull requests?"
+    description: >
+      If set to 'true', the action will delete old comments on pull requests
+      before posting new ones. This can help keep the comment section clean.
     required: false
     default: "false"
   relativeMode:
-    description:
-      "Generate a report comparing the current branch with the target branch"
+    description: >
+      If set to 'true', the action will generate a report comparing the current
+      branch with the target branch. This can be useful for identifying changes
+      introduced in a pull request.
     required: true
     default: "true"
 runs:
