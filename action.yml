@@ -27,8 +27,9 @@ inputs:
     default: "latest"
   skipInstall:
     description: >
-      If set to 'true', the action will skip the installation of Vue Mess Detector.
-      This can be useful if Vue Mess Detector is already installed in your environment.
+      If set to 'true', the action will skip the installation of Vue Mess
+      Detector. This can be useful if Vue Mess Detector is already installed in
+      your environment.
     required: true
     default: "false"
   skipBots:
@@ -52,8 +53,8 @@ inputs:
     required: false
   runArgs:
     description: >
-      Additional arguments to pass to Vue Mess Detector when running the analysis.
-      This can be used to customize the behavior of the analysis.
+      Additional arguments to pass to Vue Mess Detector when running the
+      analysis. This can be used to customize the behavior of the analysis.
     default: "--group=file"
     required: false
   entryPoint:
