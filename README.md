@@ -61,7 +61,7 @@ jobs:
         name: Install pnpm
         with:
           run_install: false
-          version: 'latest'
+          version: 'latest' # delete this line if you have packageManager defined in package.json
 
       - name: Install Node.js
         uses: actions/setup-node@v4
