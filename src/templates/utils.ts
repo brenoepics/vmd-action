@@ -6,6 +6,7 @@ import {
 } from "../types.js";
 import * as github from "@actions/github";
 import { artifactText } from "./commentTemplate.js";
+import { Context } from "@actions/github/lib/context.js";
 
 export function getReportAsMap(report: {
   [p: string]: ReportOutput[] | undefined;
@@ -55,12 +56,14 @@ export function replaceRepoData(
   message: string,
   artifactId: number | undefined
 ): string {
+  const context: Context = github.context;
   return message
+    .replace(/{{serverUrl}}/g, context.serverUrl)
+    .replace(/{{runId}}/g, context.runId.toString())
+    .replace(/{{repositoryName}}/g, context.repo.repo)
+    .replace(/{{repositoryOwner}}/g, context.repo.owner)
     .replace(/{{artifactText}}/g, artifactId ? artifactText : "")
-    .replace(/{{artifactId}}/g, String(artifactId ?? 0))
-    .replace(/{{runId}}/g, github.context.runId.toString())
-    .replace(/{{repositoryName}}/g, github.context.repo.repo)
-    .replace(/{{repositoryOwner}}/g, github.context.repo.owner);
+    .replace(/{{artifactId}}/g, String(artifactId ?? 0));
 }
 
 export function replaceBadges(message: string, badges: string[]): string {

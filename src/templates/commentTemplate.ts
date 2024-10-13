@@ -34,7 +34,7 @@ export const newCoverageInfo: string = `
 `;
 
 export const artifactText: string = `
-🔍 [Download Full Analysis Details](https://github.com/{{repositoryOwner}}/{{repositoryName}}/actions/runs/{{runId}}/artifacts/{{artifactId}})
+🔍 [Download Full Analysis Details]({{serverUrl}}/{{repositoryOwner}}/{{repositoryName}}/actions/runs/{{runId}}/artifacts/{{artifactId}})
 `;
 
 export function getCommentTemplate(
