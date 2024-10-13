@@ -30,7 +30,10 @@ workflow.
 Here's an example of how to
 use it:
 
-```yml
+<details>
+<summary>pnpm</summary>
+
+```yaml
 name: VMD Analysis
 
 on:
@@ -54,22 +57,203 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          run_install: false
+          version: 'latest' # delete this line if you have packageManager defined in package.json
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Vue Mess Detector Analysis
         uses: brenoepics/vmd-action@v0.0.6
-          # with:
-            # check inputs for full args list
-
 ```
+
+</details>
+
+<details>
+<summary>npm</summary>
+
+```yaml
+name: VMD Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect-mess:
+    runs-on: ubuntu-latest
+    name: Detect Vue Mess
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Vue Mess Detector Analysis
+        uses: brenoepics/vmd-action@v0.0.6
+```
+
+</details>
+
+<details>
+<summary>yarn</summary>
+
+```yaml
+name: VMD Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect-mess:
+    runs-on: ubuntu-latest
+    name: Detect Vue Mess
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+
+      - name: Vue Mess Detector Analysis
+        uses: brenoepics/vmd-action@v0.0.6
+```
+
+</details>
+
+<details>
+<summary>bun</summary>
+
+```yaml
+name: VMD Analysis
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  detect-mess:
+    runs-on: ubuntu-latest
+    name: Detect Vue Mess
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 'latest'
+
+      - name: Vue Mess Detector Analysis
+        uses: brenoepics/vmd-action@v0.0.6
+```
+
+</details>
 
 ## Usage
 
-After installing the `vmd-action`, Once a pull request is opened, you will start receiving comments and report
-artifacts.
+See [action.yml](action.yml)
+
+<!-- start usage -->
+```yaml
+- uses: brenoepics/vmd-action@v0.0.6
+  with:
+    # Personal access token (PAT) used to fetch the repository. The PAT is
+    # configured with the local git config, which enables your scripts to run
+    # authenticated git commands. The post-job step removes the PAT.
+    #
+    # We recommend using a service account with the least permissions necessary.
+    # Also when generating a new PAT, select the least scopes necessary.
+    #
+    # [Learn more about creating and using encrypted
+    # secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+    github-token: ''
+
+    # Version of Vue Mess Detector to use. This can be a specific version number
+    # or 'latest' to use the most recent version available.
+    version: ''
+
+    # If set to 'true', the action will skip the installation of Vue Mess Detector.
+    # This can be useful if Vue Mess Detector is already installed in your environment.
+    skipInstall: ''
+
+    # If set to 'true', the action will skip running analysis on pull requests
+    # created by bots. This can help reduce unnecessary analysis runs.
+    skipBots: ''
+
+    # If set to 'true', the action will post comments on pull requests with the
+    # results of the analysis. If set to 'false', no comments will be posted.
+    commentsEnabled: ''
+
+    # The package manager to use for installing dependencies. Supported values
+    # are 'npm', 'yarn', 'pnpm', and 'bun'. If not specified, the action will
+    # attempt to detect the package manager based on the lock file present in
+    # the repository.
+    packageManager: ''
+
+    # Additional arguments to pass to Vue Mess Detector when running the analysis.
+    # This can be used to customize the behavior of the analysis.
+    runArgs: ''
+
+    # The entry point for Vue Mess Detector. This is the directory where the
+    # analysis will start. If not specified, the current directory will be used.
+    entryPoint: ''
+
+    # The source directory to analyze. This should be the path to the directory
+    # containing the source code you want to analyze. If not specified, 'src/'
+    # will be used.
+    srcDir: ''
+
+    # If set to 'true', the action will delete old comments on pull requests
+    # before posting new ones. This can help keep the comment section clean.
+    deleteOldComments: ''
+
+    # If set to 'true', the action will generate a report comparing the current
+    # branch with the target branch. This can be useful for identifying changes
+    # introduced in a pull request.
+    relativeMode: ''
+```
+<!-- end usage -->
 
 ## Inputs
 
