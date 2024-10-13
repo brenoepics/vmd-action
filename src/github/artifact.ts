@@ -4,12 +4,12 @@ import {
   ArtifactClient,
   DefaultArtifactClient
 } from "@actions/artifact/lib/internal/client.js";
+import { WORKFLOW_HASH } from "../helpers/constants.js";
 
 function generateArtifactName(): string {
   const prefix: string = "vmd-report";
   const randomHash: string = Math.floor(Math.random() * 1e8).toString();
-  const timestamp: string = Date.now().toString();
-  return `${prefix}-${randomHash}-${timestamp}`;
+  return `${prefix}-${WORKFLOW_HASH}-${randomHash}`;
 }
 
 export async function uploadOutputArtifact(

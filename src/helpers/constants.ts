@@ -1,3 +1,6 @@
+import crypto from "node:crypto";
+import * as github from "@actions/github";
+
 export const ERROR_WEIGHT: number = 1.5;
 export const LOW_HEALTH_THRESHOLD: number = 75;
 export const MEDIUM_HEALTH_THRESHOLD: number = 85;
@@ -8,3 +11,8 @@ export const ASSETS_URL: string =
 export const ISSUES_URL: string =
   "https://github.com/brenoepics/vmd-action/issues/";
 export const REPORT_PATH: string = "vmd-analysis.json";
+
+export const WORKFLOW_HASH: string = crypto
+  .createHash("sha256")
+  .update(github.context.workflow)
+  .digest("hex");
