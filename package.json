@@ -16,7 +16,7 @@
     "package:watch": "pnpm run package --watch",
     "test": "pnpm vitest --coverage --run",
     "prepublishOnly": "pnpm run clean && pnpm install && pnpm run build",
-    "release": "pnpm preflight && changelogen --release --bump && git push --follow-tags",
+    "release": "pnpm preflight && changelogen --release --bump",
     "preflight": "pnpm install && pnpm run format:write && pnpm run lint && pnpm run test && pnpm run package",
     "prepare": "husky"
   },

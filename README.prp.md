@@ -1,3 +1,4 @@
+{_ alertMessage _}
 <div align="center">
 
 # Vue Mess Detector Action
@@ -70,7 +71,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.6
+        uses: brenoepics/vmd-action@{_ currentVersion _}
 ```
 
 </details>
@@ -108,7 +109,7 @@ jobs:
           node-version: 20
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.6
+        uses: brenoepics/vmd-action@{_ currentVersion _}
 ```
 
 </details>
@@ -147,7 +148,7 @@ jobs:
           cache: 'yarn'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.6
+        uses: brenoepics/vmd-action@{_ currentVersion _}
 ```
 
 </details>
@@ -185,7 +186,7 @@ jobs:
           bun-version: 'latest'
 
       - name: Vue Mess Detector Analysis
-        uses: brenoepics/vmd-action@v0.0.6
+        uses: brenoepics/vmd-action@{_ currentVersion _}
 ```
 
 </details>
@@ -196,7 +197,7 @@ See [action.yml](action.yml)
 
 <!-- start usage -->
 ```yaml
-- uses: brenoepics/vmd-action@v0.0.6
+- uses: brenoepics/vmd-action@{_ currentVersion _}
   with:
     # Personal access token (PAT) used to fetch the repository. The PAT is
     # configured with the local git config, which enables your scripts to run
