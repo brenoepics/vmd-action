@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@actions/artifact':
-        specifier: 2.1.10
-        version: 2.1.10
+        specifier: 2.1.11
+        version: 2.1.11
       '@actions/cache':
         specifier: 3.2.4
         version: 3.2.4
@@ -72,8 +72,8 @@ importers:
 
 packages:
 
-  '@actions/artifact@2.1.10':
-    resolution: {integrity: sha512-3c6DP+ZiTgHuXYaNO3W0MnoK//ZfBnJEam1SpOZuR2epNWO7m8Wh72IdhiKMib4DMyNNt8924TOUaR2X4cRPHQ==}
+  '@actions/artifact@2.1.11':
+    resolution: {integrity: sha512-V/N/3yM3oLxozq2dpdGqbd/39UbDOR54bF25vYsvn3QZnyZERSzPjTAAwpGzdcwESye9G7vnuhPiKQACEuBQpg==}
 
   '@actions/cache@3.2.4':
     resolution: {integrity: sha512-RuHnwfcDagtX+37s0ZWy7clbOfnZ7AlDJQ7k/9rzt2W4Gnwde3fa/qjSjVuz4vLcLIpc7fUob27CMrqiWZytYA==}
@@ -945,10 +945,6 @@ packages:
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
-
-  crypto@1.0.1:
-    resolution: {integrity: sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==}
-    deprecated: This package is no longer supported. It's now a built-in Node module. If you've depended on crypto, you should switch to the one that's built-in.
 
   debug@4.3.6:
     resolution: {integrity: sha512-O/09Bd4Z1fBrU4VzkhFqVgpPzaGbw6Sm9FEkBT1A/YBXQFGuuSxa1dN2nxgxS34JmKXqYx8CZAwEVoJFImUXIg==}
@@ -2107,7 +2103,7 @@ packages:
 
 snapshots:
 
-  '@actions/artifact@2.1.10':
+  '@actions/artifact@2.1.11':
     dependencies:
       '@actions/core': 1.11.1
       '@actions/github': 5.1.1
@@ -2119,7 +2115,6 @@ snapshots:
       '@octokit/request-error': 5.1.0
       '@protobuf-ts/plugin': 2.9.4
       archiver: 7.0.1
-      crypto: 1.0.1
       jwt-decode: 3.1.2
       twirp-ts: 2.5.0(@protobuf-ts/plugin@2.9.4)
       unzip-stream: 0.3.4
@@ -3078,8 +3073,6 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
-
-  crypto@1.0.1: {}
 
   debug@4.3.6:
     dependencies:
