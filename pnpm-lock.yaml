@@ -12,8 +12,8 @@ importers:
         specifier: 2.1.10
         version: 2.1.10
       '@actions/cache':
-        specifier: 3.2.4
-        version: 3.2.4
+        specifier: 4.0.0
+        version: 4.0.0
       '@actions/core':
         specifier: ^1.11.1
         version: 1.11.1
@@ -75,8 +75,8 @@ packages:
   '@actions/artifact@2.1.10':
     resolution: {integrity: sha512-3c6DP+ZiTgHuXYaNO3W0MnoK//ZfBnJEam1SpOZuR2epNWO7m8Wh72IdhiKMib4DMyNNt8924TOUaR2X4cRPHQ==}
 
-  '@actions/cache@3.2.4':
-    resolution: {integrity: sha512-RuHnwfcDagtX+37s0ZWy7clbOfnZ7AlDJQ7k/9rzt2W4Gnwde3fa/qjSjVuz4vLcLIpc7fUob27CMrqiWZytYA==}
+  '@actions/cache@4.0.0':
+    resolution: {integrity: sha512-WIuxjnZ44lNYtIS4fqSaYvF00hORdy3cSin+jx8xNgBVGWnNIAiCBHjlwusVQlcgExoQC9pHXGrDsZyZr7rCDQ==}
 
   '@actions/core@1.11.1':
     resolution: {integrity: sha512-hXJCSrkwfA46Vd9Z3q4cpEpHB1rL5NG04+/rbqW9d3+CSvtB1tYe8UTpAlixa1vj0m/ULglfEK2UKxMGxCxv5A==}
@@ -1965,11 +1965,6 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  uuid@3.4.0:
-    resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
-    hasBin: true
-
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
@@ -2128,7 +2123,7 @@ snapshots:
       - supports-color
       - ts-proto
 
-  '@actions/cache@3.2.4':
+  '@actions/cache@4.0.0':
     dependencies:
       '@actions/core': 1.11.1
       '@actions/exec': 1.1.1
@@ -2138,11 +2133,13 @@ snapshots:
       '@azure/abort-controller': 1.1.0
       '@azure/ms-rest-js': 2.7.0
       '@azure/storage-blob': 12.24.0
+      '@protobuf-ts/plugin': 2.9.4
       semver: 6.3.1
-      uuid: 3.4.0
+      twirp-ts: 2.5.0(@protobuf-ts/plugin@2.9.4)
     transitivePeerDependencies:
       - encoding
       - supports-color
+      - ts-proto
 
   '@actions/core@1.11.1':
     dependencies:
@@ -4095,8 +4092,6 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
-
-  uuid@3.4.0: {}
 
   uuid@8.3.2: {}
 
