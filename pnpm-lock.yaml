@@ -23,6 +23,9 @@ importers:
       execa:
         specifier: 9.5.2
         version: 9.5.2
+      vmd-action:
+        specifier: 'link:'
+        version: 'link:'
     devDependencies:
       '@types/node':
         specifier: 22.10.2
