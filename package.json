@@ -28,7 +28,7 @@
     "@actions/cache": "4.0.0",
     "@actions/core": "^1.11.1",
     "@actions/github": "^6.0.0",
-    "execa": "9.4.0"
+    "execa": "9.5.2"
   },
   "devDependencies": {
     "@types/node": "22.7.4",
