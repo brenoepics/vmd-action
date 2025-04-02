@@ -57,8 +57,8 @@ jobs:
             yes "my-package" | head -n 1 | yarn --cwd . create vue . --default --typescript
             yarn --cwd . install
           elif [ "${{ matrix.package-manager }}" == "bun" ]; then
-            yes "my-package" | head -n 1 | bun create vue . --default --typescript --cwd=. --ignore-scripts
-            bun install --cwd=. --ignore-scripts
+            yes "my-package" | head -n 1 | bun create vue . --default --typescript --ignore-scripts
+            bun install --ignore-scripts
           else
             yes "my-package" | head -n 1 | npm create vue@latest -- . --default --typescript
             npm install
